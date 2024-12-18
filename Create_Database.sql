@@ -1,9 +1,21 @@
+-- 创建用户类型表
+CREATE TABLE UserTypes (
+    UserTypeID INT PRIMARY KEY AUTO_INCREMENT,  -- 用户类型ID
+    UserTypeName VARCHAR(50) NOT NULL           -- 用户类型名称
+);
+
+-- 插入三种用户类型
+INSERT INTO UserTypes (UserTypeName)
+VALUES ('普通用户'), ('客服'), ('超级管理员');
+
 -- 创建用户表
 CREATE TABLE Users (
-    IDCardNumber CHAR(18) PRIMARY KEY,   -- 身份证号作为主键
-    Name VARCHAR(100) NOT NULL,           -- 姓名
-    Age INT NOT NULL,                     -- 年龄
-    Gender CHAR(1) CHECK (Gender IN ('M', 'F'))  -- 性别（M代表男性，F代表女性）
+    IDCardNumber CHAR(18) PRIMARY KEY,    -- 用户身份证号，作为主键
+    Name VARCHAR(100) NOT NULL,            -- 用户姓名
+    Age INT NOT NULL,                      -- 用户年龄
+    Gender CHAR(1) CHECK (Gender IN ('M', 'F')),  -- 用户性别（M代表男性，F代表女性）
+    UserTypeID INT,                        -- 用户类型ID，外键引用UserTypes表
+    FOREIGN KEY (UserTypeID) REFERENCES UserTypes(UserTypeID)
 );
 
 -- 创建套餐表
@@ -18,7 +30,7 @@ CREATE TABLE Packages (
     OverQuotaStandard DECIMAL(10, 2)      -- 超套标准
 );
 
--- 创建电话账户表
+-- 修改电话号码表，增加密码和用户类型字段
 CREATE TABLE PhoneAccounts (
     PhoneNumber CHAR(11) PRIMARY KEY,      -- 电话号码作为主键
     Balance DECIMAL(10, 2) NOT NULL,       -- 账户余额
@@ -28,8 +40,10 @@ CREATE TABLE PhoneAccounts (
     PackageEndTime DATETIME,               -- 套餐失效时间
     IDCardNumber CHAR(18),                 -- 外键，关联到用户表的身份证号
     PackageID INT,                         -- 外键，关联到套餐表的套餐ID
-    FOREIGN KEY (IDCardNumber) REFERENCES Users(IDCardNumber),
-    FOREIGN KEY (PackageID) REFERENCES Packages(PackageID)
+    Password VARCHAR(255) NOT NULL,         -- 密码字段
+    UserTypeID INT,                        -- 用户类型ID，外键关联到UserTypes表
+    FOREIGN KEY (PackageID) REFERENCES Packages(PackageID),
+    FOREIGN KEY (UserTypeID) REFERENCES UserTypes(UserTypeID)  -- 用户类型字段
 );
 
 -- 创建通话记录表
