@@ -33,7 +33,7 @@ def create_new_phone_account(phone_number, id_card_number, password, package_id=
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # 默认套餐ID
-    default_package_id = 1
+    default_package_id = "T1"
 
     # 如果没有提供套餐ID，使用默认套餐ID
     if package_id is None:

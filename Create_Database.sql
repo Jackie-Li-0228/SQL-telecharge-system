@@ -109,6 +109,6 @@ CREATE TABLE PhoneAccount_Services (
     PurchaseTime DATETIME NOT NULL,        -- 服务购买时间
     ActivationTime DATETIME NOT NULL,      -- 服务生效时间
     PhoneNumber CHAR(11),                  -- 外键，关联到电话账户表的电话号码
-    ServiceID INT,                         -- 外键，关联到业务表或套餐表的服务ID
-    FOREIGN KEY (PhoneNumber) REFERENCES PhoneAccounts(PhoneNumber),
+    ServiceID VARCHAR(5),                         -- 外键，关联到业务表或套餐表的服务ID
+    FOREIGN KEY (PhoneNumber) REFERENCES PhoneAccounts(PhoneNumber)
 );
