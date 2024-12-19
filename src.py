@@ -70,12 +70,12 @@ def create_new_phone_account(phone_number, id_card_number, password, package_id=
 
 
 # 使用函数
-try:
-    create_new_phone_account("13812345678", "123456789012345678", "securepassword123")
-except UserNotFoundError as e:
-    print(f"User not found: {e}")
-except DatabaseError as e:
-    print(f"Database error: {e}")
+# try:
+#     create_new_phone_account("13812345678", "123456789012345678", "securepassword123")
+# except UserNotFoundError as e:
+#     print(f"User not found: {e}")
+# except DatabaseError as e:
+#     print(f"Database error: {e}")
 
 def make_payment(phone_number, amount, payment_method):
     """
@@ -133,14 +133,14 @@ def make_payment(phone_number, amount, payment_method):
         raise PaymentProcessingError(f"Error processing payment for phone number {phone_number}: {err}")
 
 # 使用函数
-try:
-    make_payment("13812345678", 50.00, "credit card")
-except PhoneNumberNotFoundError as e:
-    print(f"Error: {e}")
-except PaymentProcessingError as e:
-    print(f"Error: {e}")
-except ValueError as e:
-    print(f"Error: {e}")
+# try:
+#     make_payment("13812345678", 50.00, "credit card")
+# except PhoneNumberNotFoundError as e:
+#     print(f"Error: {e}")
+# except PaymentProcessingError as e:
+#     print(f"Error: {e}")
+# except ValueError as e:
+#     print(f"Error: {e}")
 
 
 def get_user_info_by_phone(phone_number):
@@ -186,11 +186,11 @@ def get_user_info_by_phone(phone_number):
 
 
 # 使用函数获取用户信息
-try:
-    user_info = get_user_info_by_phone("13812345678")
-    print(user_info)
-except PhoneNumberNotFoundError as e:
-    print(f"Error: {e}")
+# try:
+#     user_info = get_user_info_by_phone("13812345678")
+#     print(user_info)
+# except PhoneNumberNotFoundError as e:
+#     print(f"Error: {e}")
 
 def register_user(id_card_number, name, age, gender, user_type_name="普通用户"):
     """
@@ -234,12 +234,12 @@ def register_user(id_card_number, name, age, gender, user_type_name="普通用�
 
 
 # 使用示例
-try:
-    register_user("123456789012345678", "张三", 28, "M", "普通用户")
-except UserTypeNotFoundError as e:
-    print(f"Error: {e}")
-except DatabaseError as e:
-    print(f"Database error: {e}")
+# try:
+#     register_user("123456789012345678", "张三", 28, "M", "普通用户")
+# except UserTypeNotFoundError as e:
+#     print(f"Error: {e}")
+# except DatabaseError as e:
+#     print(f"Database error: {e}")
 
 def get_package_details(phone_number):
     """
@@ -296,13 +296,13 @@ def get_package_details(phone_number):
         # 捕获数据库错误并抛出异常
         raise DatabaseError(f"Error while fetching package details: {err}")
 
-try:
-    package_info = get_package_details("13812345678")
-    print(package_info)
-except PhoneNumberNotFoundError as e:
-    print(f"Error: {e}")
-except DatabaseError as e:
-    print(f"Database error: {e}")
+# try:
+#     package_info = get_package_details("13812345678")
+#     print(package_info)
+# except PhoneNumberNotFoundError as e:
+#     print(f"Error: {e}")
+# except DatabaseError as e:
+#     print(f"Database error: {e}")
 
 def get_available_packages():
     """
@@ -354,12 +354,12 @@ def get_available_packages():
         # 捕获数据库错误并抛出异常
         raise DatabaseError(f"Error while fetching available packages: {err}")
     
-try:
-    available_packages = get_available_packages()
-    for package in available_packages:
-        print(package)
-except DatabaseError as e:
-    print(f"Database error: {e}")
+# try:
+#     available_packages = get_available_packages()
+#     for package in available_packages:
+#         print(package)
+# except DatabaseError as e:
+#     print(f"Database error: {e}")
   
 def change_phone_package(phone_number, new_package_id):
     """
@@ -416,13 +416,10 @@ def change_phone_package(phone_number, new_package_id):
         db.rollback()
         raise DatabaseError(f"Error while changing package for phone number {phone_number}: {err}")
 
-try:
-    change_phone_package('13812345678', 'T1')
-except DatabaseError as e:
-    print(f"Database error: {e}")
-
-import mysql.connector
-from datetime import datetime
+# try:
+#     change_phone_package('13812345678', 'T1')
+# except DatabaseError as e:
+#     print(f"Database error: {e}")
 
 def change_package_for_all(phone_number):
     try:
@@ -516,15 +513,15 @@ def change_package_for_all(phone_number):
         print(f"Error occurred: {e}")
         db.rollback()
 
-try:
-    change_package_for_all("13812345678")
-except (PhoneNumberNotFoundError, UserNotAdminError, InvalidDateError, NoLastMonthPackagesError, NoValidPackageFoundError) as e:
-    print(f"Error occurred: {e}")
+# try:
+#     change_package_for_all("13812345678")
+# except (PhoneNumberNotFoundError, UserNotAdminError, InvalidDateError, NoLastMonthPackagesError, NoValidPackageFoundError) as e:
+#     print(f"Error occurred: {e}")
 
 def record_call(caller, receiver, call_duration_minutes):
-'''
-    给定主叫号码、被叫号码和通话时长，记录通话记录到数据库中。
-'''
+    '''
+        给定主叫号码、被叫号码和通话时长，记录通话记录到数据库中。
+    '''
     try:
         # 检查号码是否有效
         cursor.execute("SELECT 1 FROM PhoneAccounts WHERE PhoneNumber = %s", (caller,))
@@ -556,12 +553,12 @@ def record_call(caller, receiver, call_duration_minutes):
         db.rollback()
 
 # 函数使用示例
-caller = "13800000001"
-receiver = "13800000002"
-call_duration_minutes = 5  # 通话时长为5分钟
+# caller = "13800000001"
+# receiver = "13800000002"
+# call_duration_minutes = 5  # 通话时长为5分钟
 
-try:
-    record_call(caller, receiver, call_duration_minutes)
-except Exception as e:
-    print(f"Error occurred: {e}")
+# try:
+#     record_call(caller, receiver, call_duration_minutes)
+# except Exception as e:
+#     print(f"Error occurred: {e}")
 
