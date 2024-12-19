@@ -46,10 +46,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         try:
             connection = pymysql.connect(
-                host="localhost",        # 数据库主机
-                user="root",    # 数据库用户名
-                password="123123", # 数据库密码
-                database="telecharge",  # 数据库名称
+                host="localhost",    
+                user="root", 
+                password="123123", 
+                database="telecharge",
                 cursorclass=pymysql.cursors.DictCursor
             )
             with connection.cursor() as cursor:
