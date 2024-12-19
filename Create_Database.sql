@@ -84,13 +84,21 @@ CREATE TABLE PaymentRecords (
     FOREIGN KEY (PhoneNumber) REFERENCES PhoneAccounts(PhoneNumber)
 );
 
+CREATE TABLE ActivationMethods (
+    ActivationMethodID INT PRIMARY KEY AUTO_INCREMENT,  -- 生效方式ID
+    ActivationMethodName VARCHAR(50) NOT NULL           -- 生效方式名称
+);
+
+INSERT INTO ActivationMethods (ActivationMethodID, ActivationMethodName) VALUES (1, "立即生效"), (2, "次月生效");
+
 -- 创建业务表
 CREATE TABLE Services (
     ServiceID VARCHAR(5) PRIMARY KEY,             -- 业务ID作为主键
     Name VARCHAR(100) NOT NULL,             -- 业务名称
     Price DECIMAL(10, 2) NOT NULL,         -- 业务价格
     Quota DECIMAL(10, 2) NOT NULL,         -- 业务额度
-    ActivationMethod VARCHAR(50) NOT NULL  -- 生效方式
+    ActivationMethodID INT NOT NULL,  -- 生效方式
+    FOREIGN KEY (ActivationMethodID) REFERENCES ActivationMethods(ActivationMethodID)
 );
 
 -- 创建交易记录表
