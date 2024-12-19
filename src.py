@@ -575,10 +575,11 @@ def record_call(caller, receiver, call_duration_minutes):
 # except Exception as e:
 #     print(f"Error occurred: {e}")
 
-def add_package(package_id, package_name, price, contract_duration, voice_quota, over_quota_standard, expiration_time=None, launch_time=None):
+def add_package_for_admin(phone_number,package_id, package_name, price, contract_duration, voice_quota, over_quota_standard, expiration_time=None, launch_time=None):
     """
     向套餐表中插入一条新套餐记录
     
+    :param phone_number: 手机号，用来确认是否是管理员的操作
     :param package_id: 套餐ID
     :param package_name: 套餐名称
     :param price: 套餐价格
@@ -588,6 +589,12 @@ def add_package(package_id, package_name, price, contract_duration, voice_quota,
     :param expiration_time: 下架时间（可选，默认为NULL）
     :param launch_time: 上架时间（可选，默认为当前时间）
     """
+    # 确认手机号是否是管理员
+    cursor.execute("""SELECT UserTypeID FROM PhoneAccounts WHERE PhoneNumber = %s""", (phone_number,))
+    user_type_id = cursor.fetchone()[0]
+    if user_type_id != 3:
+        raise UserNotAdminError(f"Phone number {phone_number} does not have admin privileges.")
+
     if launch_time is None:
         launch_time = datetime.now()
 
@@ -607,13 +614,357 @@ def add_package(package_id, package_name, price, contract_duration, voice_quota,
         db.rollback()
 
 # 函数使用示例
+# phone_number = "114514"  # 管理员手机号
 # package_id = "T2"
 # package_name = "超值套餐"
 # price = 19.99
 # contract_duration = 12  # 合约期为12个月
 # voice_quota = 500.00  # 语音额度500分钟
 # over_quota_standard = 0.15  # 超套标准0.15元/分钟
+# 
+# try:
+#     add_package_for_admin(phone_number,package_id, package_name, price, contract_duration, voice_quota, over_quota_standard)
+# except Exception as e:
+#     print(f"An error occurred: {e}")
 
-# # 调用函数，上架一个新套餐
-# add_package(package_id, package_name, price, contract_duration, voice_quota, over_quota_standard)
+def remove_package_for_admin(phone_number, package_id):
+    """
+    下架指定套餐：如果手机号对应用户是管理员，则将套餐失效时间设置为当前时间
+    
+    :param phone_number: 用户手机号
+    :param package_id: 套餐ID
+    """
+    try:
+        # 查询该手机号对应的用户的 UserTypeID
+        cursor.execute("""
+            SELECT ut.UserTypeID 
+            FROM PhoneAccounts pa
+            JOIN UserTypes ut ON pa.UserTypeID = ut.UserTypeID
+            WHERE pa.PhoneNumber = %s
+        """, (phone_number,))
+        
+        result = cursor.fetchone()
+        
+        if result is None:
+            raise PhoneNumberNotFoundError(f"Phone number {phone_number} not found.")
+        
+        user_type_id = result[0]
+        
+        # 检查用户是否为管理员（假设管理员的 UserTypeID 是 3）
+        if user_type_id != 3:
+            raise UserNotAdminError(f"Phone number {phone_number} does not have admin privileges.")
+        
+        # 如果是管理员，更新套餐的失效时间为当前时间
+        current_time = datetime.now()
+
+        # 更新套餐表中的 ExpirationTime
+        cursor.execute("""
+            UPDATE Packages
+            SET ExpirationTime = %s
+            WHERE PackageID = %s
+            AND ExpirationTime IS NULL
+        """, (current_time, package_id))
+        
+        # 提交事务
+        db.commit()
+        print(f"Package {package_id} has been successfully removed (expired) at {current_time}.")
+    
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+        db.rollback()
+    
+    except UserNotAdminError as e:
+        print(f"Error: {e}")
+    
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+
+# 示例：下架某个套餐
+# phone_number = "13812345678"  # 管理员手机号
+# package_id = "T2"  # 套餐ID
+
+# try:
+#     remove_package_for_admin(phone_number, package_id)
+# except Exception as e:
+#     print(f"An error occurred: {e}")
+
+def get_call_records_by_phone(phone_number):
+    """
+    获取与手机号相关的所有通话记录，包括呼出和被呼出的记录
+    
+    :param phone_number: 用户手机号
+    :return: 通话记录列表
+    """
+    try:
+        # 查询与该手机号相关的所有通话记录
+        cursor.execute("""
+            SELECT CallID, CallTime, CallDuration, Caller, Receiver
+            FROM CallRecords
+            WHERE Caller = %s OR Receiver = %s
+            ORDER BY CallTime DESC
+        """, (phone_number, phone_number))
+        
+        # 获取所有结果
+        call_records = cursor.fetchall()
+        
+        if not call_records:
+            raise PhoneNumberNotFoundError(f"No call records found for phone number {phone_number}.")
+        
+        # 格式化通话记录并返回
+        records = []
+        for record in call_records:
+            call_id, call_time, call_duration, caller, receiver = record
+            records.append({
+                "CallID": call_id,
+                "CallTime": call_time,
+                "CallDuration": call_duration,
+                "Caller": caller,
+                "Receiver": receiver
+            })
+        
+        return records
+    
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+
+# 示例：获取某个手机号的所有通话记录
+# phone_number = "13800000001"  # 输入手机号
+
+# try:
+#     call_records = get_call_records_by_phone(phone_number)
+    
+#     # 输出通话记录
+#     for record in call_records:
+#         print(f"CallID: {record['CallID']}, Time: {record['CallTime']}, Duration: {record['CallDuration']}s, Caller: {record['Caller']}, Receiver: {record['Receiver']}")
+# except Exception as e:
+#     print(f"An error occurred: {e}")
+
+def get_payment_records_by_phone(phone_number):
+    """
+    获取与手机号相关的所有缴费记录
+    
+    :param phone_number: 用户手机号
+    :return: 缴费记录列表
+    """
+    try:
+        # 查询与该手机号相关的所有缴费记录
+        cursor.execute("""
+            SELECT PaymentID, PaymentTime, Amount, PaymentMethod, PhoneNumber
+            FROM PaymentRecords
+            WHERE PhoneNumber = %s
+            ORDER BY PaymentTime DESC
+        """, (phone_number,))
+        
+        # 获取所有结果
+        payment_records = cursor.fetchall()
+        
+        if not payment_records:
+            raise PhoneNumberNotFoundError(f"No payment records found for phone number {phone_number}.")
+        
+        # 格式化缴费记录并返回
+        records = []
+        for record in payment_records:
+            payment_id, payment_time, amount, payment_method, phone_number = record
+            records.append({
+                "PaymentID": payment_id,
+                "PaymentTime": payment_time,
+                "Amount": amount,
+                "PaymentMethod": payment_method,
+                "PhoneNumber": phone_number
+            })
+        
+        return records
+    
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+        return []
+
+# 示例：获取某个手机号的所有缴费记录
+# phone_number = "13412345678"  # 输入手机号
+
+# try:
+#     payment_records = get_payment_records_by_phone(phone_number)
+    
+#     # 输出缴费记录
+#     for record in payment_records:
+#         print(f"PaymentID: {record['PaymentID']}, Time: {record['PaymentTime']}, Amount: {record['Amount']}€, Method: {record['PaymentMethod']}, PhoneNumber: {record['PhoneNumber']}")
+# except Exception as e:
+#     print(f"An error occurred: {e}")
+
+def get_transaction_records_by_phone(phone_number):
+    """
+    获取与手机号相关的所有交易记录
+    
+    :param phone_number: 用户手机号
+    :return: 交易记录列表
+    """
+    try:
+        # 查询与该手机号相关的所有交易记录
+        cursor.execute("""
+            SELECT TransactionID, TransactionTime, PurchasedItem, Amount, PhoneNumber
+            FROM TransactionRecords
+            WHERE PhoneNumber = %s
+            ORDER BY TransactionTime DESC
+        """, (phone_number,))
+        
+        # 获取所有结果
+        transaction_records = cursor.fetchall()
+        
+        if not transaction_records:
+            raise PhoneNumberNotFoundError(f"No transaction records found for phone number {phone_number}.")
+        
+        # 格式化交易记录并返回
+        records = []
+        for record in transaction_records:
+            transaction_id, transaction_time, purchased_item, amount, phone_number = record
+            records.append({
+                "TransactionID": transaction_id,
+                "TransactionTime": transaction_time,
+                "PurchasedItem": purchased_item,
+                "Amount": amount,
+                "PhoneNumber": phone_number
+            })
+        
+        return records
+    
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+        return []
+
+# 示例：获取某个手机号的所有交易记录
+# phone_number = "13812345679"  # 输入手机号
+
+# try:
+#     transaction_records = get_transaction_records_by_phone(phone_number)
+    
+#     # 输出交易记录
+#     for record in transaction_records:
+#         print(f"TransactionID: {record['TransactionID']}, Time: {record['TransactionTime']}, Item: {record['PurchasedItem']}, Amount: {record['Amount']}€, PhoneNumber: {record['PhoneNumber']}")
+# except Exception as e:
+#     print(f"An error occurred: {e}")
+
+def get_services_by_phone(phone_number):
+    """
+    获取与手机号相关的所有手机号-服务表记录
+    
+    :param phone_number: 用户手机号
+    :return: 服务记录列表
+    """
+    try:
+        # 查询与该手机号相关的所有手机号-服务表记录
+        cursor.execute("""
+            SELECT PhoneServiceID, PurchaseTime, ActivationTime, PhoneNumber, ServiceID
+            FROM PhoneAccount_Services
+            WHERE PhoneNumber = %s
+            ORDER BY PurchaseTime DESC
+        """, (phone_number,))
+        
+        # 获取所有结果
+        service_records = cursor.fetchall()
+        
+        if not service_records:
+            raise PhoneNumberNotFoundError(f"No service records found for phone number {phone_number}.")
+        
+        # 格式化服务记录并返回
+        records = []
+        for record in service_records:
+            phone_service_id, purchase_time, activation_time, phone_number, service_id = record
+            records.append({
+                "PhoneServiceID": phone_service_id,
+                "PurchaseTime": purchase_time,
+                "ActivationTime": activation_time,
+                "PhoneNumber": phone_number,
+                "ServiceID": service_id
+            })
+        
+        return records
+    
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+        return []
+
+# 示例：获取某个手机号的所有手机号-服务表记录
+# phone_number = "13812345679"  # 输入手机号
+
+# try:
+#     service_records = get_services_by_phone(phone_number)
+    
+#     # 输出服务记录
+#     for record in service_records:
+#         print(f"PhoneServiceID: {record['PhoneServiceID']}, PurchaseTime: {record['PurchaseTime']}, ActivationTime: {record['ActivationTime']}, ServiceID: {record['ServiceID']}")
+# except Exception as e:
+#     print(f"An error occurred: {e}")
+
+def add_service_for_admin(phone_number, service_id, service_name, price, quota, activation_method_id):
+    """
+    上架业务的函数
+    
+    :param phone_number: 用户手机号，用于检查是否为管理员
+    :param service_id: 业务ID
+    :param service_name: 业务名称
+    :param price: 业务价格
+    :param quota: 业务额度
+    :param activation_method_id: 激活方式ID（1表示立即生效，2表示次月生效）
+    :return: None
+    """
+    try:
+        # 检查手机号是否为管理员
+        cursor.execute("""
+            SELECT UserTypeID
+            FROM PhoneAccounts
+            WHERE PhoneNumber = %s
+        """, (phone_number,))
+        
+        result = cursor.fetchone()
+        if not result or result[0] != 3:  # 3 代表管理员
+            raise UserNotAdminError(f"Phone number {phone_number} is not an admin.")
+
+        # 获取当前时间并设置激活时间
+        current_time = datetime.now()
+        if activation_method_id == 1:
+            activation_time = current_time  # 立即生效
+        elif activation_method_id == 2:
+            # 次月生效
+            activation_time = datetime(current_time.year, current_time.month + 1, 1)
+        else:
+            raise ValueError("Invalid activation method ID. Must be 1 or 2.")
+
+        # 插入新的业务记录
+        cursor.execute("""
+            INSERT INTO Services (ServiceID, Name, Price, Quota, ActivationMethodID)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (service_id, service_name, price, quota, activation_method_id))
+
+        # 提交事务
+        db.commit()
+        print(f"Service {service_name} with ID {service_id} added successfully.")
+    
+    except UserNotAdminError as e:
+        print(f"Error: {e}")
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+        db.rollback()
+    except ValueError as e:
+        print(f"Error: {e}")
+
+# 示例：上架业务
+# phone_number = "13834567890"  # 管理员手机号
+# service_id = "S1"  # 业务ID
+# service_name = "高级语音包"  # 业务名称
+# price = 99.99  # 业务价格
+# quota = 100  # 业务额度
+# activation_method_id = 1  # 立即生效
+
+# try:
+#     add_service_for_admin(phone_number, service_id, service_name, price, quota, activation_method_id)
+# except Exception as e:
+#     print(f"An error occurred: {e}")
 

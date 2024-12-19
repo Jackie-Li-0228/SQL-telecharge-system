@@ -45,7 +45,9 @@ CREATE TABLE Packages (
 -- 向套餐表中插入默认套餐数据
 INSERT INTO Packages (PackageID, PackageName, Price, LaunchTime, ExpirationTime, ContractDuration, VoiceQuota, OverQuotaStandard)
 VALUES 
-    ("T1", '默认套餐', 8.00, '1999-01-01 00:00:00', NULL, 1, 0.00, 0.10);
+    ("T1", '默认套餐', 8.00, '1999-01-01 00:00:00', NULL, 1, 0.00, 0.10),
+    ("T2", '超值套餐', 18.00, '1999-01-01 00:00:00', NULL, 3, 100.00, 0.10),
+    ("T3", '尊享套餐', 38.00, '1999-01-01 00:00:00', NULL, 6, 200.00, 0.10);
 
 -- 修改电话号码表，增加密码和用户类型字段
 CREATE TABLE PhoneAccounts (
@@ -62,6 +64,13 @@ CREATE TABLE PhoneAccounts (
     FOREIGN KEY (PackageID) REFERENCES Packages(PackageID),
     FOREIGN KEY (UserTypeID) REFERENCES UserTypes(UserTypeID)  -- 用户类型字段
 );
+
+# 插入一些示例电话号码数据
+INSERT INTO PhoneAccounts (PhoneNumber, Balance, IsSuspended, VoiceBalance, PackageStartTime, IDCardNumber, PackageID, Password, UserTypeID)
+VALUES
+    ('13812345678', 100.00, FALSE, 0.00,NOW(), '123456789012345678', 'T1', '123456', 1),
+    ('13823456789', 200.00, FALSE, 100.00,NOW(), '234567890123456789', 'T2', '123456', 2),
+    ('13834567890', 300.00, FALSE, 200.00,NOW(), '345678901234567890', 'T3', '123456', 3);
 
 -- 创建通话记录表
 CREATE TABLE CallRecords (
@@ -84,13 +93,21 @@ CREATE TABLE PaymentRecords (
     FOREIGN KEY (PhoneNumber) REFERENCES PhoneAccounts(PhoneNumber)
 );
 
+CREATE TABLE ActivationMethods (
+    ActivationMethodID INT PRIMARY KEY AUTO_INCREMENT,  -- 生效方式ID
+    ActivationMethodName VARCHAR(50) NOT NULL           -- 生效方式名称
+);
+
+INSERT INTO ActivationMethods (ActivationMethodID, ActivationMethodName) VALUES (1, "立即生效"), (2, "次月生效");
+
 -- 创建业务表
 CREATE TABLE Services (
     ServiceID VARCHAR(5) PRIMARY KEY,             -- 业务ID作为主键
     Name VARCHAR(100) NOT NULL,             -- 业务名称
     Price DECIMAL(10, 2) NOT NULL,         -- 业务价格
     Quota DECIMAL(10, 2) NOT NULL,         -- 业务额度
-    ActivationMethod VARCHAR(50) NOT NULL  -- 生效方式
+    ActivationMethodID INT NOT NULL,  -- 生效方式
+    FOREIGN KEY (ActivationMethodID) REFERENCES ActivationMethods(ActivationMethodID)
 );
 
 -- 创建交易记录表
