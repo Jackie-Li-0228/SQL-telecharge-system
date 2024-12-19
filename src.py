@@ -91,6 +91,9 @@ def make_payment(phone_number, amount, payment_method):
     - PhoneNumberNotFoundError: If the phone number is not found in the database.
     - PaymentProcessingError: If there is an error during the payment processing (e.g., database issues).
     """
+    if amount <= 0:
+        # 充值额度不能为负数
+        raise ValueError("Payment amount must be greater than zero.")
 
     # 获取当前时间
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -104,7 +107,7 @@ def make_payment(phone_number, amount, payment_method):
         raise PhoneNumberNotFoundError(f"Phone number {phone_number} not found.")
 
     # 更新余额
-    new_balance = account[0] + Decimal(amount)
+    new_balance = account[0] + Decimal("{:.2f}".format(amount))
     
     try:
         # 更新电话号码的余额
@@ -135,6 +138,8 @@ try:
 except PhoneNumberNotFoundError as e:
     print(f"Error: {e}")
 except PaymentProcessingError as e:
+    print(f"Error: {e}")
+except ValueError as e:
     print(f"Error: {e}")
 
 

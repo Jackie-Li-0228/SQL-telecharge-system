@@ -51,3 +51,9 @@ class NoValidPackageFoundError(Exception):
     def __init__(self, message="No valid package found for the current month."):
         self.message = message
         super().__init__(self.message)
+
+class ValueError(Exception):
+    """Exception raised when a value is invalid."""
+    def __init__(self, message="Value is invalid"):
+        self.message = message
+        super().__init__(self.message)
