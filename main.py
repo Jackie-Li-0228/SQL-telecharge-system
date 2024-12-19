@@ -1,13 +1,15 @@
 import sys
 import os
-from PyQt6 import QtWidgets, uic
+import warnings
 import pymysql
+from PyQt6 import QtWidgets, uic, QtGui, QtCore
 from Exception_Classes import *
 from src import TelechargeSystem  
 
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
-        super(MainWindow, self).__init__()
+        super().__init__()  
 
         # 构建UI文件的绝对路径
         ui_path = os.path.join(os.path.dirname(__file__), 'src', 'telecharge.ui')
@@ -22,7 +24,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tabWidget = self.findChild(QtWidgets.QTabWidget, 'tabWidget')
         if self.tabWidget:
             self.tabWidget.tabBar().setVisible(False)
-            self.tabWidget.setCurrentIndex(0)  # 设置初始为第一个Tab（登录Tab）
+            self.tabWidget.setCurrentIndex(0)  
         else:
             QtWidgets.QMessageBox.critical(self, "错误", "找不到tabWidget控件")
             sys.exit(1)
@@ -36,9 +38,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # 初始化TelechargeSystem实例
         self.system = TelechargeSystem()
 
-        # 加载套餐数据到taocancombox
+        # 加载套餐数据
         self.load_packages()
-
+        
     def load_packages(self):
         try:
             connection = pymysql.connect(
@@ -109,15 +111,16 @@ class MainWindow(QtWidgets.QMainWindow):
                     raise ValueError("未知的用户类型。")
 
         except UserNotFoundError as e:
-            QtWidgets.QMessageBox.warning(self, "登录失败", str(e))
+            QtWidgets.QMessageBox.warning(self, "登录失败，用户不存在", str(e))
         except ValueError as e:
-            QtWidgets.QMessageBox.warning(self, "登录失败", str(e))
+            QtWidgets.QMessageBox.warning(self, "登录失败，密码错误", str(e))
         except pymysql.MySQLError as e:
             QtWidgets.QMessageBox.critical(self, "数据库错误", str(e))
         except Exception as e:
-            QtWidgets.QMessageBox.critical(self, "错误", str(e))
+            QtWidgets.QMessageBox.critical(self, "未知错误，请联系技术人员解决", str(e))
         finally:
             connection.close()
+
 
     def gotoregister(self):
         self.tabWidget.setCurrentIndex(2) 
@@ -144,7 +147,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return
 
         try:
-            # 调用src.py中的create_new_phone_account函数，错了大概率不是这里的问题
+            # 调用src.py中的create_new_phone_account函数
             self.system.create_new_phone_account(
                 phone_number=phone,
                 name=name,
