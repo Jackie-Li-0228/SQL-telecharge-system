@@ -902,3 +902,69 @@ def get_services_by_phone(phone_number):
 #         print(f"PhoneServiceID: {record['PhoneServiceID']}, PurchaseTime: {record['PurchaseTime']}, ActivationTime: {record['ActivationTime']}, ServiceID: {record['ServiceID']}")
 # except Exception as e:
 #     print(f"An error occurred: {e}")
+
+def add_service_for_admin(phone_number, service_id, service_name, price, quota, activation_method_id):
+    """
+    上架业务的函数
+    
+    :param phone_number: 用户手机号，用于检查是否为管理员
+    :param service_id: 业务ID
+    :param service_name: 业务名称
+    :param price: 业务价格
+    :param quota: 业务额度
+    :param activation_method_id: 激活方式ID（1表示立即生效，2表示次月生效）
+    :return: None
+    """
+    try:
+        # 检查手机号是否为管理员
+        cursor.execute("""
+            SELECT UserTypeID
+            FROM PhoneAccounts
+            WHERE PhoneNumber = %s
+        """, (phone_number,))
+        
+        result = cursor.fetchone()
+        if not result or result[0] != 3:  # 3 代表管理员
+            raise UserNotAdminError(f"Phone number {phone_number} is not an admin.")
+
+        # 获取当前时间并设置激活时间
+        current_time = datetime.now()
+        if activation_method_id == 1:
+            activation_time = current_time  # 立即生效
+        elif activation_method_id == 2:
+            # 次月生效
+            activation_time = datetime(current_time.year, current_time.month + 1, 1)
+        else:
+            raise ValueError("Invalid activation method ID. Must be 1 or 2.")
+
+        # 插入新的业务记录
+        cursor.execute("""
+            INSERT INTO Services (ServiceID, Name, Price, Quota, ActivationMethodID)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (service_id, service_name, price, quota, activation_method_id))
+
+        # 提交事务
+        db.commit()
+        print(f"Service {service_name} with ID {service_id} added successfully.")
+    
+    except UserNotAdminError as e:
+        print(f"Error: {e}")
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+        db.rollback()
+    except ValueError as e:
+        print(f"Error: {e}")
+
+# 示例：上架业务
+# phone_number = "13834567890"  # 管理员手机号
+# service_id = "S1"  # 业务ID
+# service_name = "高级语音包"  # 业务名称
+# price = 99.99  # 业务价格
+# quota = 100  # 业务额度
+# activation_method_id = 1  # 立即生效
+
+# try:
+#     add_service_for_admin(phone_number, service_id, service_name, price, quota, activation_method_id)
+# except Exception as e:
+#     print(f"An error occurred: {e}")
+
