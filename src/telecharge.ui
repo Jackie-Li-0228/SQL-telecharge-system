@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>651</width>
+    <height>546</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(173, 216, 230);</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="styleSheet">
+       <string notr="true">QTabWidget::pane {
+    border-top: -1px;
+    border-left: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+}
+QTabBar::tab {
+    color: rgb(255, 255, 255);
+    border: 0.5px solid lightgray;
+    padding: 5px;
+}
+QTabBar::tab:selected {
+    color: rgb(255, 255, 255);
+    margin-bottom: -1px;
+}</string>
+      </property>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <property name="styleSheet">
+        <string notr="true">background-color: transparent; color: rgb(255, 255, 255);</string>
+       </property>
+       <attribute name="title">
+        <string>Login</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QListView" name="listView">
+          <property name="styleSheet">
+           <string notr="true">border-image: url(:/picture/background.png);</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLineEdit" name="teleNumber">
+            <property name="styleSheet">
+             <string notr="true">border: 1px solid blue; color: black;</string>
+            </property>
+            <property name="placeholderText">
+             <string>Tele-Number</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="secret">
+            <property name="styleSheet">
+             <string notr="true">border: 1px solid blue; color: black;</string>
+            </property>
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
+            </property>
+            <property name="placeholderText">
+             <string>Secret</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="loginButton">
+            <property name="styleSheet">
+             <string notr="true">border: 1px solid blue; color: black;</string>
+            </property>
+            <property name="text">
+             <string>Login</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <property name="styleSheet">
+        <string notr="true">background-color: transparent; color: rgb(255, 255, 255);</string>
+       </property>
+       <attribute name="title">
+        <string>Home</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <property name="styleSheet">
+        <string notr="true">background-color: transparent; color: rgb(255, 255, 255);</string>
+       </property>
+       <attribute name="title">
+        <string>Register</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>651</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QMenu {
+background-color: rgb(26, 26, 46);
+gridline-color: rgb(15, 52, 96);
+selection-background-color: rgb(15, 52, 96);
+color: rgb(255, 255, 255);
+font: 500 11pt &quot;Poppins&quot;;
+}
+
+QMenuBar {
+    background-color: rgb(26, 26, 46);
+    selection-background-color: rgb(15, 52, 96);
+    color: rgb(255, 255, 255);
+    spacing: 3px;
+}
+QMenuBar::item:selected {
+    background: rgb(15, 52, 96);
+    color: rgb(255, 255, 255);
+}</string>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="qrc/background.qrc"/>
+ </resources>
+ <connections/>
+</ui>
