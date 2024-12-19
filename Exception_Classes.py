@@ -57,3 +57,9 @@ class ValueError(Exception):
     def __init__(self, message="Value is invalid"):
         self.message = message
         super().__init__(self.message)
+
+class InformationNotMatchError(Exception):
+    """Exception raised when the information does not match the database."""
+    def __init__(self, message="Information does not match."):
+        self.message = message
+        super().__init__(self.message)

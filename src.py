@@ -13,7 +13,7 @@ db = mysql.connector.connect(
 
 cursor = db.cursor()
 
-def create_new_phone_account(phone_number, id_card_number, password, package_id=None):
+def create_new_phone_account(phone_number, name, id_card_number, password, package_id=None):
     """
     Function to create a new phone account with the given phone number, ID card, and password.
     If package_id is not provided, it uses the default package ID.
@@ -42,7 +42,19 @@ def create_new_phone_account(phone_number, id_card_number, password, package_id=
     # 查询用户的用户类型（UserTypeID）
     cursor.execute("SELECT UserTypeID FROM Users WHERE IDCardNumber = %s", (id_card_number,))
     user_type_result = cursor.fetchone()
+
+    # 检查目标手机号有没有注册过
+    cursor.execute("SELECT PhoneNumber FROM PhoneAccounts WHERE PhoneNumber = %s", (phone_number,))
+    phone_account = cursor.fetchone()
+    if phone_account is not None:
+        raise DatabaseError(f"Phone number {phone_number} already exists.")
     
+    cursor.execute("SELECT Name FROM Users WHERE IDCardNumber = %s", (id_card_number,))
+    user_name = cursor.fetchone()
+    print(user_name)
+    if user_name[0]!=name:
+        raise InformationNotMatchError(f"User name {name} does not match the ID card number {id_card_number}.")
+
     if user_type_result is None:
         # 抛出用户不存在的异常
         raise UserNotFoundError(f"User with the given ID card number {id_card_number} does not exist.")
@@ -67,15 +79,16 @@ def create_new_phone_account(phone_number, id_card_number, password, package_id=
         # 捕获数据库错误并抛出自定义异常
         db.rollback()
         raise DatabaseError(f"Database error occurred: {err}")
-
-
+    
 # 使用函数
-# try:
-#     create_new_phone_account("13812345678", "123456789012345678", "securepassword123")
-# except UserNotFoundError as e:
-#     print(f"User not found: {e}")
-# except DatabaseError as e:
-#     print(f"Database error: {e}")
+try:
+    create_new_phone_account("13812345678","张三", "123456789012345678", "securepassword123")
+except UserNotFoundError as e:
+    print(f"User not found: {e}")
+except DatabaseError as e:
+    print(f"Database error: {e}")
+except InformationNotMatchError as e:
+    print(f"Information not match: {e}")
 
 def make_payment(phone_number, amount, payment_method):
     """
@@ -561,4 +574,46 @@ def record_call(caller, receiver, call_duration_minutes):
 #     record_call(caller, receiver, call_duration_minutes)
 # except Exception as e:
 #     print(f"Error occurred: {e}")
+
+def add_package(package_id, package_name, price, contract_duration, voice_quota, over_quota_standard, expiration_time=None, launch_time=None):
+    """
+    向套餐表中插入一条新套餐记录
+    
+    :param package_id: 套餐ID
+    :param package_name: 套餐名称
+    :param price: 套餐价格
+    :param contract_duration: 合约期（以月为单位）
+    :param voice_quota: 语音额度
+    :param over_quota_standard: 超套标准
+    :param expiration_time: 下架时间（可选，默认为NULL）
+    :param launch_time: 上架时间（可选，默认为当前时间）
+    """
+    if launch_time is None:
+        launch_time = datetime.now()
+
+    try:
+        # 插入套餐数据
+        cursor.execute("""
+            INSERT INTO Packages (PackageID, PackageName, Price, LaunchTime, ExpirationTime, ContractDuration, VoiceQuota, OverQuotaStandard)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (package_id, package_name, price, launch_time, expiration_time, contract_duration, voice_quota, over_quota_standard))
+
+        # 提交事务
+        db.commit()
+        print(f"Package '{package_name}' with ID {package_id} added successfully.")
+    
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        db.rollback()
+
+# 函数使用示例
+# package_id = "T2"
+# package_name = "超值套餐"
+# price = 19.99
+# contract_duration = 12  # 合约期为12个月
+# voice_quota = 500.00  # 语音额度500分钟
+# over_quota_standard = 0.15  # 超套标准0.15元/分钟
+
+# # 调用函数，上架一个新套餐
+# add_package(package_id, package_name, price, contract_duration, voice_quota, over_quota_standard)
 
