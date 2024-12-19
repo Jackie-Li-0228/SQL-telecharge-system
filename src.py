@@ -680,10 +680,171 @@ def remove_package_for_admin(phone_number, package_id):
         print(f"Error: {e}")
 
 # 示例：下架某个套餐
-phone_number = "13812345678"  # 管理员手机号
-package_id = "T2"  # 套餐ID
+# phone_number = "13812345678"  # 管理员手机号
+# package_id = "T2"  # 套餐ID
 
-try:
-    remove_package_for_admin(phone_number, package_id)
-except Exception as e:
-    print(f"An error occurred: {e}")
+# try:
+#     remove_package_for_admin(phone_number, package_id)
+# except Exception as e:
+#     print(f"An error occurred: {e}")
+
+def get_call_records_by_phone(phone_number):
+    """
+    获取与手机号相关的所有通话记录，包括呼出和被呼出的记录
+    
+    :param phone_number: 用户手机号
+    :return: 通话记录列表
+    """
+    try:
+        # 查询与该手机号相关的所有通话记录
+        cursor.execute("""
+            SELECT CallID, CallTime, CallDuration, Caller, Receiver
+            FROM CallRecords
+            WHERE Caller = %s OR Receiver = %s
+            ORDER BY CallTime DESC
+        """, (phone_number, phone_number))
+        
+        # 获取所有结果
+        call_records = cursor.fetchall()
+        
+        if not call_records:
+            raise PhoneNumberNotFoundError(f"No call records found for phone number {phone_number}.")
+        
+        # 格式化通话记录并返回
+        records = []
+        for record in call_records:
+            call_id, call_time, call_duration, caller, receiver = record
+            records.append({
+                "CallID": call_id,
+                "CallTime": call_time,
+                "CallDuration": call_duration,
+                "Caller": caller,
+                "Receiver": receiver
+            })
+        
+        return records
+    
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+
+# 示例：获取某个手机号的所有通话记录
+# phone_number = "13800000001"  # 输入手机号
+
+# try:
+#     call_records = get_call_records_by_phone(phone_number)
+    
+#     # 输出通话记录
+#     for record in call_records:
+#         print(f"CallID: {record['CallID']}, Time: {record['CallTime']}, Duration: {record['CallDuration']}s, Caller: {record['Caller']}, Receiver: {record['Receiver']}")
+# except Exception as e:
+#     print(f"An error occurred: {e}")
+
+def get_payment_records_by_phone(phone_number):
+    """
+    获取与手机号相关的所有缴费记录
+    
+    :param phone_number: 用户手机号
+    :return: 缴费记录列表
+    """
+    try:
+        # 查询与该手机号相关的所有缴费记录
+        cursor.execute("""
+            SELECT PaymentID, PaymentTime, Amount, PaymentMethod, PhoneNumber
+            FROM PaymentRecords
+            WHERE PhoneNumber = %s
+            ORDER BY PaymentTime DESC
+        """, (phone_number,))
+        
+        # 获取所有结果
+        payment_records = cursor.fetchall()
+        
+        if not payment_records:
+            raise PhoneNumberNotFoundError(f"No payment records found for phone number {phone_number}.")
+        
+        # 格式化缴费记录并返回
+        records = []
+        for record in payment_records:
+            payment_id, payment_time, amount, payment_method, phone_number = record
+            records.append({
+                "PaymentID": payment_id,
+                "PaymentTime": payment_time,
+                "Amount": amount,
+                "PaymentMethod": payment_method,
+                "PhoneNumber": phone_number
+            })
+        
+        return records
+    
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+        return []
+
+# 示例：获取某个手机号的所有缴费记录
+# phone_number = "13412345678"  # 输入手机号
+
+# try:
+#     payment_records = get_payment_records_by_phone(phone_number)
+    
+#     # 输出缴费记录
+#     for record in payment_records:
+#         print(f"PaymentID: {record['PaymentID']}, Time: {record['PaymentTime']}, Amount: {record['Amount']}€, Method: {record['PaymentMethod']}, PhoneNumber: {record['PhoneNumber']}")
+# except Exception as e:
+#     print(f"An error occurred: {e}")
+
+def get_transaction_records_by_phone(phone_number):
+    """
+    获取与手机号相关的所有交易记录
+    
+    :param phone_number: 用户手机号
+    :return: 交易记录列表
+    """
+    try:
+        # 查询与该手机号相关的所有交易记录
+        cursor.execute("""
+            SELECT TransactionID, TransactionTime, PurchasedItem, Amount, PhoneNumber
+            FROM TransactionRecords
+            WHERE PhoneNumber = %s
+            ORDER BY TransactionTime DESC
+        """, (phone_number,))
+        
+        # 获取所有结果
+        transaction_records = cursor.fetchall()
+        
+        if not transaction_records:
+            raise PhoneNumberNotFoundError(f"No transaction records found for phone number {phone_number}.")
+        
+        # 格式化交易记录并返回
+        records = []
+        for record in transaction_records:
+            transaction_id, transaction_time, purchased_item, amount, phone_number = record
+            records.append({
+                "TransactionID": transaction_id,
+                "TransactionTime": transaction_time,
+                "PurchasedItem": purchased_item,
+                "Amount": amount,
+                "PhoneNumber": phone_number
+            })
+        
+        return records
+    
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+        return []
+
+# 示例：获取某个手机号的所有交易记录
+# phone_number = "13812345679"  # 输入手机号
+
+# try:
+#     transaction_records = get_transaction_records_by_phone(phone_number)
+    
+#     # 输出交易记录
+#     for record in transaction_records:
+#         print(f"TransactionID: {record['TransactionID']}, Time: {record['TransactionTime']}, Item: {record['PurchasedItem']}, Amount: {record['Amount']}€, PhoneNumber: {record['PhoneNumber']}")
+# except Exception as e:
+#     print(f"An error occurred: {e}")
