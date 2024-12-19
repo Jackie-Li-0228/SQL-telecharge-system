@@ -998,3 +998,138 @@ class TelechargeSystem:
 
     # 示例：查看所有可用的业务
     # get_available_services()
+
+    def subscribe_service(self, phone_number, service_id):
+        # 查询业务信息
+        self.cursor.execute("""
+            SELECT ServiceID, Price, ActivationMethodID FROM Services WHERE ServiceID = %s
+        """, (service_id,))
+        service = self.cursor.fetchone()
+        
+        # 如果没有找到对应的业务，抛出异常
+        if service is None:
+            raise NoValidServiceFoundError(f"Service with ServiceID {service_id} not found.")
+        
+        service_id, price, activation_method_id = service
+        
+        # 获取当前时间
+        current_time = datetime.now()
+        
+        if activation_method_id == 1:
+            # 立即扣费：从手机号余额中扣费，并创建交易记录
+            self.cursor.execute("""
+                UPDATE PhoneAccounts 
+                SET Balance = Balance - %s
+                WHERE PhoneNumber = %s AND Balance >= %s
+            """, (price, phone_number, price))
+            
+            # 创建交易记录
+            self.cursor.execute("""
+                INSERT INTO TransactionRecords (TransactionTime, PurchasedItem, Amount, PhoneNumber)
+                VALUES (%s, %s, %s, %s)
+            """, (current_time, service_id, price, phone_number))
+            
+            # 提交事务
+            self.db.commit()
+            print(f"Service {service_id} immediately charged for phone number {phone_number}.")
+
+        elif activation_method_id == 2:
+            # 次月扣费：创建交易记录，生效时间为次月的第一天
+            next_month_first_day = datetime(current_time.year, current_time.month, 1) + timedelta(days=32)
+            next_month_first_day = datetime(next_month_first_day.year, next_month_first_day.month, 1)
+
+            # 创建交易记录
+            self.cursor.execute("""
+                INSERT INTO PhoneAccount_Services (PurchaseTime,ActivationTime, PhoneNumber,ServiceID)
+                VALUES (%s, %s, %s, %s)
+            """, (current_time, next_month_first_day, phone_number, service_id))
+            
+            # 提交事务
+            self.db.commit()
+            print(f"Service {service_id} scheduled for next month billing for phone number {phone_number}.")
+
+    # try:
+    #     service.subscribe_service('13800138000', 'S1')  # 传入手机号和业务ID
+    # except NoValidServiceFoundError as e:
+    #     print(f"Error: {e}")
+    # except ValueError as e:
+    #     print(f"Error: {e}")
+
+    def simulate_call(self, caller_number, receiver_number, call_duration):
+        # Step 1: 检查呼出手机号是否停机
+        self.cursor.execute("""
+            SELECT IsSuspended, VoiceBalance, PackageID FROM PhoneAccounts WHERE PhoneNumber = %s
+        """, (caller_number,))
+        account = self.cursor.fetchone()
+
+        if account is None:
+            raise ValueError(f"Phone number {caller_number} not found.")
+        
+        is_suspended, voice_balance, package_id = account
+
+        if is_suspended:
+            raise PhoneSuspendedError(f"Phone number {caller_number} is suspended.")
+
+        # Step 2: 记录通话
+        self.record_call(caller_number, receiver_number, call_duration)
+
+        # Step 3: 查询套餐的超套标准
+        self.cursor.execute("""
+            SELECT OverQuotaStandard FROM Packages WHERE PackageID = %s
+        """, (package_id,))
+        package = self.cursor.fetchone()
+
+        if package is None:
+            raise ValueError(f"Package {package_id} not found.")
+        
+        over_quota_standard = package[0]
+
+        # Step 4: 计算资费
+        call_duration_in_minutes = call_duration  # 通话时长单位为分钟
+        total_cost = 0
+        
+        if voice_balance >= call_duration_in_minutes:
+            print("Im here 1",call_duration_in_minutes,caller_number)
+            print(f"UPDATE PhoneAccounts SET VoiceBalance = VoiceBalance - {call_duration_in_minutes} WHERE PhoneNumber = {caller_number}")
+            # 语音余额足够，资费为0
+            total_cost = 0
+            self.cursor.execute("""
+                UPDATE PhoneAccounts
+                SET VoiceBalance = VoiceBalance - %s
+                WHERE PhoneNumber = %s;
+            """, (call_duration_in_minutes, caller_number,))
+        else:
+            # 语音余额不足，超出部分需要扣费
+            print("Im here 2",call_duration_in_minutes,caller_number)
+            print(f"UPDATE PhoneAccounts SET VoiceBalance = 0 WHERE PhoneNumber = {caller_number}")
+            total_cost = (call_duration_in_minutes - voice_balance) * over_quota_standard
+            self.cursor.execute("""
+                UPDATE PhoneAccounts
+                SET VoiceBalance = 0
+                WHERE PhoneNumber = %s;
+            """, (caller_number,))
+            self.cursor.execute("""
+                UPDATE PhoneAccounts
+                SET Balance = Balance - %s
+                WHERE PhoneNumber = %s;
+            """, (total_cost, caller_number,))
+
+        # Step 5: 更新交易记录
+        if total_cost > 0:
+            current_time = datetime.now()
+            self.cursor.execute("""
+                INSERT INTO TransactionRecords (TransactionTime, PurchasedItem, Amount, PhoneNumber)
+                VALUES (%s, %s, %s, %s)
+            """, (current_time, "通话超套资费", total_cost, caller_number))
+            self.db.commit()
+            print(f"Phone number {caller_number} has been charged {total_cost} for exceeding voice quota.")
+        if total_cost == 0:
+            print(f"Phone number {caller_number} has sufficient voice balance for the call.")
+            self.db.commit()
+
+    # try:
+    #     service.simulate_call('13800138000', '13800138001', 5)  # 呼出手机号、被呼手机号、通话时长（分钟）
+    # except PhoneSuspendedError as e:
+    #     print(f"Error: {e}")
+    # except ValueError as e:
+    #     print(f"Error: {e}")
