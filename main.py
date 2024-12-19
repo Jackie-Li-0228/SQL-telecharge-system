@@ -32,6 +32,9 @@ class MainWindow(QtWidgets.QMainWindow):
             sys.exit(1)
 
         self.loginButton.clicked.connect(self.login) 
+        self.gotoregisterButton.clicked.connect(self.gotoregister)
+        self.registerButton.clicked.connect(self.register)
+        self.backtologinButton.clicked.connect(self.backtoLogin)
 
     def login(self):
         phone = self.loginTeleNumberEdit.text().strip()  
@@ -90,34 +93,17 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.critical(self, "错误", str(e))
         finally:
             connection.close()
-
-class UserWindow(QtWidgets.QWidget):
-    def __init__(self):
-        super(UserWindow, self).__init__()
-        ui_path = os.path.join(os.path.dirname(__file__), 'src', 'user.ui')
-        if not os.path.exists(ui_path):
-            QtWidgets.QMessageBox.critical(self, "错误", f"找不到UI文件: {ui_path}")
-            sys.exit(1)
-        uic.loadUi(ui_path, self)
-
-class ServerWindow(QtWidgets.QWidget):
-    def __init__(self):
-        super(ServerWindow, self).__init__()
-        ui_path = os.path.join(os.path.dirname(__file__), 'src', 'server.ui')
-        if not os.path.exists(ui_path):
-            QtWidgets.QMessageBox.critical(self, "错误", f"找不到UI文件: {ui_path}")
-            sys.exit(1)
-        uic.loadUi(ui_path, self)
-
-class AdminWindow(QtWidgets.QWidget):
-    def __init__(self):
-        super(AdminWindow, self).__init__()
-        ui_path = os.path.join(os.path.dirname(__file__), 'src', 'admin.ui')  # 修改为admin.ui
-        if not os.path.exists(ui_path):
-            QtWidgets.QMessageBox.critical(self, "错误", f"找不到UI文件: {ui_path}")
-            sys.exit(1)
-        uic.loadUi(ui_path, self)
-
+            
+    def gotoregister(self):
+        self.tabWidget.setCurrentIndex(2)
+        
+    def register(self):
+        print("注册")
+        
+    def backtoLogin(self):
+        self.tabWidget.setCurrentIndex(0)
+        
+            
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
