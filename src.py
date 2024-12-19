@@ -575,10 +575,11 @@ def record_call(caller, receiver, call_duration_minutes):
 # except Exception as e:
 #     print(f"Error occurred: {e}")
 
-def add_package(package_id, package_name, price, contract_duration, voice_quota, over_quota_standard, expiration_time=None, launch_time=None):
+def add_package_for_admin(phone_number,package_id, package_name, price, contract_duration, voice_quota, over_quota_standard, expiration_time=None, launch_time=None):
     """
     向套餐表中插入一条新套餐记录
     
+    :param phone_number: 手机号，用来确认是否是管理员的操作
     :param package_id: 套餐ID
     :param package_name: 套餐名称
     :param price: 套餐价格
@@ -588,6 +589,12 @@ def add_package(package_id, package_name, price, contract_duration, voice_quota,
     :param expiration_time: 下架时间（可选，默认为NULL）
     :param launch_time: 上架时间（可选，默认为当前时间）
     """
+    # 确认手机号是否是管理员
+    cursor.execute("""SELECT UserTypeID FROM PhoneAccounts WHERE PhoneNumber = %s""", (phone_number,))
+    user_type_id = cursor.fetchone()[0]
+    if user_type_id != 3:
+        raise UserNotAdminError(f"Phone number {phone_number} does not have admin privileges.")
+
     if launch_time is None:
         launch_time = datetime.now()
 
@@ -607,13 +614,76 @@ def add_package(package_id, package_name, price, contract_duration, voice_quota,
         db.rollback()
 
 # 函数使用示例
+# phone_number = "114514"  # 管理员手机号
 # package_id = "T2"
 # package_name = "超值套餐"
 # price = 19.99
 # contract_duration = 12  # 合约期为12个月
 # voice_quota = 500.00  # 语音额度500分钟
 # over_quota_standard = 0.15  # 超套标准0.15元/分钟
+# 
+# try:
+#     add_package_for_admin(phone_number,package_id, package_name, price, contract_duration, voice_quota, over_quota_standard)
+# except Exception as e:
+#     print(f"An error occurred: {e}")
 
-# # 调用函数，上架一个新套餐
-# add_package(package_id, package_name, price, contract_duration, voice_quota, over_quota_standard)
+def remove_package_for_admin(phone_number, package_id):
+    """
+    下架指定套餐：如果手机号对应用户是管理员，则将套餐失效时间设置为当前时间
+    
+    :param phone_number: 用户手机号
+    :param package_id: 套餐ID
+    """
+    try:
+        # 查询该手机号对应的用户的 UserTypeID
+        cursor.execute("""
+            SELECT ut.UserTypeID 
+            FROM PhoneAccounts pa
+            JOIN UserTypes ut ON pa.UserTypeID = ut.UserTypeID
+            WHERE pa.PhoneNumber = %s
+        """, (phone_number,))
+        
+        result = cursor.fetchone()
+        
+        if result is None:
+            raise PhoneNumberNotFoundError(f"Phone number {phone_number} not found.")
+        
+        user_type_id = result[0]
+        
+        # 检查用户是否为管理员（假设管理员的 UserTypeID 是 3）
+        if user_type_id != 3:
+            raise UserNotAdminError(f"Phone number {phone_number} does not have admin privileges.")
+        
+        # 如果是管理员，更新套餐的失效时间为当前时间
+        current_time = datetime.now()
 
+        # 更新套餐表中的 ExpirationTime
+        cursor.execute("""
+            UPDATE Packages
+            SET ExpirationTime = %s
+            WHERE PackageID = %s
+            AND ExpirationTime IS NULL
+        """, (current_time, package_id))
+        
+        # 提交事务
+        db.commit()
+        print(f"Package {package_id} has been successfully removed (expired) at {current_time}.")
+    
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+        db.rollback()
+    
+    except UserNotAdminError as e:
+        print(f"Error: {e}")
+    
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+
+# 示例：下架某个套餐
+phone_number = "13812345678"  # 管理员手机号
+package_id = "T2"  # 套餐ID
+
+try:
+    remove_package_for_admin(phone_number, package_id)
+except Exception as e:
+    print(f"An error occurred: {e}")
