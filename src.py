@@ -4,7 +4,7 @@ from decimal import Decimal
 from Exception_Classes import *
 
 class TelechargeSystem:
-    def __init__(self):
+    def __init__(self,db=None,cursor=None):
         # 数据库连接设置
         self.db = mysql.connector.connect(
             host="localhost",        # 数据库主机
@@ -44,6 +44,10 @@ class TelechargeSystem:
         self.cursor.execute("SELECT UserTypeID FROM Users WHERE IDCardNumber = %s", (id_card_number,))
         user_type_result = self.cursor.fetchone()
 
+        if user_type_result is None:
+        # 抛出用户不存在的异常
+            raise UserNotFoundError(f"User with the given ID card number {id_card_number} does not exist.")
+        
         # 检查目标手机号有没有注册过
         self.cursor.execute("SELECT PhoneNumber FROM PhoneAccounts WHERE PhoneNumber = %s", (phone_number,))
         phone_account = self.cursor.fetchone()
@@ -52,14 +56,10 @@ class TelechargeSystem:
         
         self.cursor.execute("SELECT Name FROM Users WHERE IDCardNumber = %s", (id_card_number,))
         user_name = self.cursor.fetchone()
-        print(user_name)
+        
         if user_name[0]!=name:
             raise InformationNotMatchError(f"User name {name} does not match the ID card number {id_card_number}.")
 
-        if user_type_result is None:
-            # 抛出用户不存在的异常
-            raise UserNotFoundError(f"User with the given ID card number {id_card_number} does not exist.")
-        
         user_type_id = user_type_result[0]
 
         # 插入新的电话号码记录
@@ -998,4 +998,3 @@ class TelechargeSystem:
 
     # 示例：查看所有可用的业务
     # get_available_services()
-

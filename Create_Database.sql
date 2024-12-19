@@ -129,3 +129,134 @@ CREATE TABLE PhoneAccount_Services (
     ServiceID VARCHAR(5),                         -- 外键，关联到业务表或套餐表的服务ID
     FOREIGN KEY (PhoneNumber) REFERENCES PhoneAccounts(PhoneNumber)
 );
+
+DELIMITER $$
+
+CREATE TRIGGER CheckBalanceLessThanZero
+BEFORE UPDATE ON PhoneAccounts
+FOR EACH ROW
+BEGIN
+    IF NEW.Balance < 0 THEN
+        SET NEW.IsSuspended = TRUE;
+    END IF;
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER CheckBalanceLargerThanZero
+BEFORE UPDATE ON PhoneAccounts
+FOR EACH ROW
+BEGIN
+    IF NEW.Balance >= 0 THEN
+        SET NEW.IsSuspended = FALSE;
+    END IF;
+END $$
+
+DELIMITER ;
+
+-- 确保事件调度器已启用
+SET GLOBAL event_scheduler = ON;
+
+-- 创建事件
+DELIMITER $$
+
+CREATE EVENT IF NOT EXISTS DeductMonthlyServiceCharges -- 对所有延时扣费业务进行扣费
+ON SCHEDULE EVERY 1 MONTH
+STARTS '2024-12-31 23:59:00'  -- 首次执行时间，定为每个月的最后一天 23:59:00
+DO
+BEGIN
+    DECLARE current_date DATE;
+    SET current_date = CURRENT_DATE;
+
+    -- 查询所有符合条件的手机号-服务记录（次月生效的服务，ActivationMethodID = 2）
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE phone_number CHAR(11);
+    DECLARE service_name VARCHAR(100);
+    DECLARE service_price DECIMAL(10, 2);
+    DECLARE service_id VARCHAR(5);
+    
+    DECLARE service_cursor CURSOR FOR
+        SELECT sa.PhoneNumber, s.Name, s.Price, sa.ServiceID
+        FROM PhoneAccount_Services sa
+        JOIN Services s ON sa.ServiceID = s.ServiceID
+        WHERE sa.ActivationMethodID = 2
+          AND MONTH(sa.PurchaseTime) = MONTH(CURRENT_DATE)  -- 确保是本月
+          AND YEAR(sa.PurchaseTime) = YEAR(CURRENT_DATE);  -- 确保是本年
+
+    -- 定义控制循环的条件
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- 打开游标
+    OPEN service_cursor;
+
+    -- 遍历每一条记录
+    read_loop: LOOP
+        FETCH service_cursor INTO phone_number, service_name, service_price, service_id;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- 更新手机号的余额，扣除相应费用
+        UPDATE PhoneAccounts
+        SET Balance = Balance - service_price
+        WHERE PhoneNumber = phone_number;
+
+        -- 在交易记录表中插入一条交易记录
+        INSERT INTO TransactionRecords (TransactionTime, PurchasedItem, Amount, PhoneNumber)
+        VALUES (CURRENT_TIMESTAMP, service_name, service_price, phone_number);
+
+    END LOOP;
+
+    -- 关闭游标
+    CLOSE service_cursor;
+
+END $$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE EVENT deduct_package_fee
+ON SCHEDULE EVERY 1 MONTH
+STARTS '2024-12-31 23:59:30'  -- 设置事件的开始时间，确保是每月最后一天的23:59:30
+DO
+BEGIN
+    -- 执行扣费操作
+    DECLARE done INT DEFAULT 0;
+    DECLARE phone_number CHAR(11);
+    DECLARE package_id VARCHAR(5);
+    DECLARE package_price DECIMAL(10, 2);
+    DECLARE cur CURSOR FOR
+        SELECT p.PhoneNumber, p.PackageID, pkg.Price,pkg.Name
+        FROM PhoneAccounts p
+        JOIN Packages pkg ON p.PackageID = pkg.PackageID
+   
+    -- 用来处理游标
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO phone_number, package_id, package_price,package_name;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- 从手机号账户中扣除套餐费用
+        UPDATE PhoneAccounts
+        SET Balance = Balance - package_price
+        WHERE PhoneNumber = phone_number;
+
+        -- 记录交易
+        INSERT INTO TransactionRecords (TransactionTime, PurchasedItem, Amount, PhoneNumber)
+        VALUES (NOW(), CONCAT('Package: ', package_name), package_price, phone_number);
+
+    END LOOP;
+
+    CLOSE cur;
+END $$
+
+DELIMITER ;
