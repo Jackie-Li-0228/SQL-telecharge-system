@@ -62,7 +62,7 @@
        </string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <property name="styleSheet">
@@ -241,7 +241,7 @@ font: 75 9pt &quot;Times New Roman&quot;;</string>
        </spacer>
       </item>
       <item alignment="Qt::AlignRight">
-       <widget class="QPushButton" name="gotoregister">
+       <widget class="QPushButton" name="gotoregisterButton">
         <property name="styleSheet">
          <string notr="true">border: 1px solid blue; color: black;
 font: 75 9pt &quot;Times New Roman&quot;;</string>
@@ -480,7 +480,7 @@ font: 75 9pt &quot;Times New Roman&quot;;</string>
        </spacer>
       </item>
       <item alignment="Qt::AlignHCenter">
-       <widget class="QPushButton" name="registerbutton">
+       <widget class="QPushButton" name="registerButton">
         <property name="minimumSize">
          <size>
           <width>200</width>
@@ -510,7 +510,7 @@ font: 75 9pt &quot;Times New Roman&quot;;</string>
        </spacer>
       </item>
       <item alignment="Qt::AlignRight">
-       <widget class="QPushButton" name="backtologin">
+       <widget class="QPushButton" name="backtologinButton">
         <property name="styleSheet">
          <string notr="true">border: 1px solid blue; color: black;
 font: 75 9pt &quot;Times New Roman&quot;;</string>
