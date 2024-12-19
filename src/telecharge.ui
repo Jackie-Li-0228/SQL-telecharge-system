@@ -458,8 +458,17 @@ font: 75 9pt &quot;Times New Roman&quot;;</string>
          <string>套餐</string>
         </property>
         <property name="styleSheet">
-         <string notr="true">border: 1px solid blue; color: black;
-font: 75 9pt &quot;Times New Roman&quot;;</string>
+         <string notr="true">
+           QComboBox {
+               border: 1px solid blue;
+               color: black;
+               font: 75 9pt "Times New Roman";
+           }
+           QComboBox QAbstractItemView {
+               background-color: white;
+               color: black;
+           }
+         </string>
         </property>
         <property name="placeholderText">
          <string/>
