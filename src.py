@@ -848,3 +848,57 @@ def get_transaction_records_by_phone(phone_number):
 #         print(f"TransactionID: {record['TransactionID']}, Time: {record['TransactionTime']}, Item: {record['PurchasedItem']}, Amount: {record['Amount']}€, PhoneNumber: {record['PhoneNumber']}")
 # except Exception as e:
 #     print(f"An error occurred: {e}")
+
+def get_services_by_phone(phone_number):
+    """
+    获取与手机号相关的所有手机号-服务表记录
+    
+    :param phone_number: 用户手机号
+    :return: 服务记录列表
+    """
+    try:
+        # 查询与该手机号相关的所有手机号-服务表记录
+        cursor.execute("""
+            SELECT PhoneServiceID, PurchaseTime, ActivationTime, PhoneNumber, ServiceID
+            FROM PhoneAccount_Services
+            WHERE PhoneNumber = %s
+            ORDER BY PurchaseTime DESC
+        """, (phone_number,))
+        
+        # 获取所有结果
+        service_records = cursor.fetchall()
+        
+        if not service_records:
+            raise PhoneNumberNotFoundError(f"No service records found for phone number {phone_number}.")
+        
+        # 格式化服务记录并返回
+        records = []
+        for record in service_records:
+            phone_service_id, purchase_time, activation_time, phone_number, service_id = record
+            records.append({
+                "PhoneServiceID": phone_service_id,
+                "PurchaseTime": purchase_time,
+                "ActivationTime": activation_time,
+                "PhoneNumber": phone_number,
+                "ServiceID": service_id
+            })
+        
+        return records
+    
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+        return []
+
+# 示例：获取某个手机号的所有手机号-服务表记录
+# phone_number = "13812345679"  # 输入手机号
+
+# try:
+#     service_records = get_services_by_phone(phone_number)
+    
+#     # 输出服务记录
+#     for record in service_records:
+#         print(f"PhoneServiceID: {record['PhoneServiceID']}, PurchaseTime: {record['PurchaseTime']}, ActivationTime: {record['ActivationTime']}, ServiceID: {record['ServiceID']}")
+# except Exception as e:
+#     print(f"An error occurred: {e}")
