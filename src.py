@@ -412,7 +412,8 @@ def change_phone_package(phone_number, new_package_id):
         raise DatabaseError(f"Error while changing package for phone number {phone_number}: {err}")
 
 try:
-    change_phone_package('13812345678', 2)
+    change_phone_package('13812345678', 'T1')
 except DatabaseError as e:
     print(f"Database error: {e}")
+
 
