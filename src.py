@@ -81,14 +81,14 @@ def create_new_phone_account(phone_number, name, id_card_number, password, packa
         raise DatabaseError(f"Database error occurred: {err}")
     
 # 使用函数
-try:
-    create_new_phone_account("13812345678","张三", "123456789012345678", "securepassword123")
-except UserNotFoundError as e:
-    print(f"User not found: {e}")
-except DatabaseError as e:
-    print(f"Database error: {e}")
-except InformationNotMatchError as e:
-    print(f"Information not match: {e}")
+# try:
+#     create_new_phone_account("13812345678","张三", "123456789012345678", "securepassword123")
+# except UserNotFoundError as e:
+#     print(f"User not found: {e}")
+# except DatabaseError as e:
+#     print(f"Database error: {e}")
+# except InformationNotMatchError as e:
+#     print(f"Information not match: {e}")
 
 def make_payment(phone_number, amount, payment_method):
     """
