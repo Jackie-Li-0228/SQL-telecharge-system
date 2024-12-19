@@ -416,4 +416,105 @@ try:
 except DatabaseError as e:
     print(f"Database error: {e}")
 
+import mysql.connector
+from datetime import datetime
 
+# 假设 db 和 cursor 已经被正确连接和初始化
+# db = mysql.connector.connect(...)
+
+def change_package_for_all(phone_number):
+    try:
+        # 获取今天的日期，判断是否是每月的第一天
+        current_date = datetime.now()
+        if current_date.day != 1:
+            raise InvalidDateError(message="You can only change the package on the first day of each month.")
+
+        # 查询手机号对应的用户类型ID
+        cursor.execute("""
+            SELECT UserTypeID FROM PhoneAccounts WHERE PhoneNumber = %s
+        """, (phone_number,))
+        result = cursor.fetchone()
+
+        if result is None:
+            raise PhoneNumberNotFoundError(message=f"Phone number {phone_number} not found in the system.")
+
+        user_type_id = result[0]
+
+        # 如果用户不是管理员
+        if user_type_id != 3:  # 假设3代表管理员
+            raise UserNotAdminError(message=f"The user associated with phone number {phone_number} is not an admin.")
+
+        # 获取上个月的信息
+        last_month = (current_date.month - 1) if current_date.month > 1 else 12
+        last_month_start = datetime(current_date.year, last_month, 1)
+
+        # 查询电话账户-服务表中的上个月套餐服务信息
+        cursor.execute("""
+            SELECT PhoneNumber, ServiceID, ActivationTime
+            FROM PhoneAccount_Services
+            WHERE ServiceID LIKE 'T%' AND ActivationTime >= %s AND ActivationTime < %s
+        """, (last_month_start, current_date))
+
+        services = cursor.fetchall()
+
+        # 如果没有找到上个月的套餐记录
+        if not services:
+            raise NoLastMonthPackagesError(message="No packages were found from the last month.")
+
+        # 使用字典保存每个手机号的最新套餐信息
+        package_updates = {}
+
+        # 遍历服务信息，找到每个手机号对应的最后一条套餐
+        for service in services:
+            phone_number = service[0]
+            if service[2] == datetime(current_date.year, current_date.month, 1):
+                # 获取套餐ID
+                new_package_id = service[1]
+                
+                # 保证只保存每个手机号的最新套餐
+                package_updates[phone_number] = (new_package_id, current_date)
+
+        # 如果没有找到有效的套餐
+        if not package_updates:
+            raise NoValidPackageFoundError(message="No valid packages found for updating any phone account.")
+
+        # 查询套餐的详细信息（包括合约期和语音额度）
+        cursor.execute("""
+            SELECT PackageID, ContractDuration, VoiceQuota
+            FROM Packages
+            WHERE PackageID IN (%s)
+        """, (",".join([package_updates[phone_number][0] for phone_number in package_updates]),))
+
+        packages = cursor.fetchall()
+        package_info_map = {pkg[0]: (pkg[1], pkg[2]) for pkg in packages}
+
+        # 更新所有手机号的套餐信息
+        for phone_number, (new_package_id, package_start_time) in package_updates.items():
+            # 获取对应套餐的合约期和语音额度
+            contract_duration, voice_quota = package_info_map.get(new_package_id, (None, None))
+
+            if contract_duration is None or voice_quota is None:
+                raise NoValidPackageFoundError(message=f"Package {new_package_id} is invalid or missing required details.")
+
+            # 计算套餐结束时间
+            package_end_time = package_start_time + timedelta(days=30 * contract_duration)  # 合约期按月计算
+
+            # 更新套餐信息
+            cursor.execute("""
+                UPDATE PhoneAccounts
+                SET PackageID = %s, PackageStartTime = %s, PackageEndTime = %s, VoiceBalance = %s
+                WHERE PhoneNumber = %s
+            """, (new_package_id, package_start_time, package_end_time, voice_quota, phone_number))
+
+        # 提交所有更新事务
+        db.commit()
+        print(f"Successfully updated {len(package_updates)} phone accounts to their new packages.")
+
+    except (PhoneNumberNotFoundError, UserNotAdminError, InvalidDateError, NoLastMonthPackagesError, NoValidPackageFoundError) as e:
+        print(f"Error occurred: {e}")
+        db.rollback()
+
+try:
+    change_package_for_all("13812345678")
+except (PhoneNumberNotFoundError, UserNotAdminError, InvalidDateError, NoLastMonthPackagesError, NoValidPackageFoundError) as e:
+    print(f"Error occurred: {e}")
