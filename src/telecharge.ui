@@ -22,7 +22,7 @@
   <property name="styleSheet">
    <string notr="true">
     /* 全局背景颜色 */
-    background-color: rgb(173, 216, 230);
+    background-color: rgb(14, 105, 195);
 
     /* 无框按钮样式（特定按钮） */
     QPushButton#registerButton, QPushButton#backtoLoginButton {
@@ -54,9 +54,9 @@
        </string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>8</number>
       </property>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tab_login">
        <property name="styleSheet">
         <string notr="true">
         background-color: transparent;
@@ -361,9 +361,9 @@ padding: 5px;</string>
           </property>
           <property name="styleSheet">
            <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-border-radius: 20px;
 padding: 5px;</string>
           </property>
           <property name="text">
@@ -437,16 +437,15 @@ color: rgb(0, 0, 0)</string>
         <item>
          <widget class="QLabel" name="label">
           <property name="styleSheet">
-           <string notr="true">
-           font: 75 9pt &quot;Times New Roman&quot;;
+           <string notr="true">font: 75 9pt &quot;Times New Roman&quot;;
            </string>
           </property>
           <property name="text">
            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;Welcome to use Our Telecharge System&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Times New Roman'; font-size:9pt; font-weight:72; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'SimSun'; font-size:16pt; font-weight:600;&quot;&gt;Welcome to use Our Telecharge System&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
@@ -465,7 +464,7 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_3">
+      <widget class="QWidget" name="tab_register">
        <property name="styleSheet">
         <string notr="true">
         background-color: transparent;
@@ -509,19 +508,6 @@ padding: 5px;</string>
           </property>
          </widget>
         </item>
-        <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
         <item alignment="Qt::AlignHCenter">
          <widget class="QLineEdit" name="nameEdit">
           <property name="sizePolicy">
@@ -542,19 +528,6 @@ padding: 5px;</string>
           </property>
          </widget>
         </item>
-        <item>
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
         <item alignment="Qt::AlignHCenter">
          <widget class="QLineEdit" name="registerteleNumberEdit">
           <property name="sizePolicy">
@@ -574,19 +547,6 @@ padding: 5px;</string>
            <string>Tele-Number</string>
           </property>
          </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
         </item>
         <item alignment="Qt::AlignHCenter">
          <widget class="QLineEdit" name="registersecretEdit">
@@ -610,19 +570,6 @@ padding: 5px;</string>
            <string>Secret</string>
           </property>
          </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
         </item>
         <item alignment="Qt::AlignHCenter">
          <widget class="QComboBox" name="taocancombox">
@@ -695,9 +642,9 @@ QAbstractItemView {
           </property>
           <property name="styleSheet">
            <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-border-radius: 20px;
 padding: 5px;</string>
           </property>
           <property name="text">
@@ -731,20 +678,286 @@ color: rgb(0, 0, 0)</string>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_4">
+      <widget class="QWidget" name="tab_user">
        <attribute name="title">
         <string>User</string>
        </attribute>
+       <widget class="QWidget" name="horizontalLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>-1</y>
+          <width>471</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QPushButton" name="myPackageButton">
+           <property name="styleSheet">
+            <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+           </property>
+           <property name="text">
+            <string>我的套餐</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_11">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="balanceButton">
+           <property name="styleSheet">
+            <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+           </property>
+           <property name="text">
+            <string>话费余额</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_12">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="callBalanceButton">
+           <property name="styleSheet">
+            <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+           </property>
+           <property name="text">
+            <string>通话余额</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="horizontalLayoutWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>70</y>
+          <width>471</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QPushButton" name="rechargeButton">
+           <property name="styleSheet">
+            <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+           </property>
+           <property name="text">
+            <string>话费充值</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_13">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="billInquiryButton">
+           <property name="styleSheet">
+            <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+           </property>
+           <property name="text">
+            <string>账单查询</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_14">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="businessHandlingButton">
+           <property name="styleSheet">
+            <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+           </property>
+           <property name="text">
+            <string>业务办理</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
-      <widget class="QWidget" name="tab_5">
+      <widget class="QWidget" name="tab_server">
        <attribute name="title">
         <string>Server</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="tab_6">
+      <widget class="QWidget" name="tab_admin">
        <attribute name="title">
         <string>Admin</string>
        </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_recharge">
+       <attribute name="title">
+        <string>Recharge</string>
+       </attribute>
+       <widget class="QPushButton" name="confirmRechargeButton">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>280</y>
+          <width>81</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+        </property>
+        <property name="text">
+         <string>充值</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="backToUserButton_recharge">
+        <property name="geometry">
+         <rect>
+          <x>350</x>
+          <y>310</y>
+          <width>121</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 9pt &quot;Times New Roman&quot;;
+color: rgb(0, 0, 0)</string>
+        </property>
+        <property name="text">
+         <string>Back</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_billInquiry">
+       <attribute name="title">
+        <string>BillInquiry</string>
+       </attribute>
+       <widget class="QPushButton" name="backToUserButton_billInquiry">
+        <property name="geometry">
+         <rect>
+          <x>340</x>
+          <y>310</y>
+          <width>121</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 9pt &quot;Times New Roman&quot;;
+color: rgb(0, 0, 0)</string>
+        </property>
+        <property name="text">
+         <string>Back</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_businessHandling">
+       <attribute name="title">
+        <string>BusinessHandling</string>
+       </attribute>
+       <widget class="QPushButton" name="backToUserButton_businessHandling">
+        <property name="geometry">
+         <rect>
+          <x>340</x>
+          <y>310</y>
+          <width>121</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 9pt &quot;Times New Roman&quot;;
+color: rgb(0, 0, 0)</string>
+        </property>
+        <property name="text">
+         <string>Back</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="handleBusinessButton">
+        <property name="geometry">
+         <rect>
+          <x>190</x>
+          <y>280</y>
+          <width>91</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+        </property>
+        <property name="text">
+         <string>办理</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
