@@ -10,6 +10,12 @@
     <height>546</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>200</width>
+    <height>30</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -56,7 +62,7 @@
        </string>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <property name="styleSheet">
@@ -143,8 +149,14 @@
         </property>
        </spacer>
       </item>
-      <item>
+      <item alignment="Qt::AlignHCenter">
        <widget class="QLineEdit" name="lineEdit">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">border: 1px solid blue; color: black; text-align: center;
 font: 75 9pt &quot;Times New Roman&quot;;</string>
@@ -167,8 +179,14 @@ font: 75 9pt &quot;Times New Roman&quot;;</string>
         </property>
        </spacer>
       </item>
-      <item>
+      <item alignment="Qt::AlignHCenter">
        <widget class="QLineEdit" name="passwordEdit">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">border: 1px solid blue; color: black; text-align: center;
 font: 75 9pt &quot;Times New Roman&quot;;</string>
@@ -194,8 +212,14 @@ font: 75 9pt &quot;Times New Roman&quot;;</string>
         </property>
        </spacer>
       </item>
-      <item>
+      <item alignment="Qt::AlignHCenter">
        <widget class="QPushButton" name="loginButton">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">border: 1px solid blue; color: black;
 font: 75 9pt &quot;Times New Roman&quot;;</string>
@@ -302,8 +326,14 @@ p, li { white-space: pre-wrap; }
         </property>
        </spacer>
       </item>
-      <item>
+      <item alignment="Qt::AlignHCenter">
        <widget class="QLineEdit" name="idCardEdit">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">border: 1px solid blue; color: black; text-align: center;
 font: 75 9pt &quot;Times New Roman&quot;;</string>
@@ -326,8 +356,14 @@ font: 75 9pt &quot;Times New Roman&quot;;</string>
         </property>
        </spacer>
       </item>
-      <item>
+      <item alignment="Qt::AlignHCenter">
        <widget class="QLineEdit" name="nameEdit">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">border: 1px solid blue; color: black; text-align: center;
 font: 75 9pt &quot;Times New Roman&quot;;</string>
@@ -350,8 +386,14 @@ font: 75 9pt &quot;Times New Roman&quot;;</string>
         </property>
        </spacer>
       </item>
-      <item>
+      <item alignment="Qt::AlignHCenter">
        <widget class="QLineEdit" name="teleNumberEdit">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">border: 1px solid blue; color: black; text-align: center;
 font: 75 9pt &quot;Times New Roman&quot;;</string>
@@ -374,8 +416,14 @@ font: 75 9pt &quot;Times New Roman&quot;;</string>
         </property>
        </spacer>
       </item>
-      <item>
+      <item alignment="Qt::AlignHCenter">
        <widget class="QLineEdit" name="secretEdit">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">border: 1px solid blue; color: black; text-align: center;</string>
         </property>
@@ -400,8 +448,47 @@ font: 75 9pt &quot;Times New Roman&quot;;</string>
         </property>
        </spacer>
       </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QComboBox" name="comboBox">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>套餐</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border: 1px solid blue; color: black;
+font: 75 9pt &quot;Times New Roman&quot;;</string>
+        </property>
+        <property name="placeholderText">
+         <string/>
+        </property>
+       </widget>
+      </item>
       <item>
+       <spacer name="verticalSpacer_7">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item alignment="Qt::AlignHCenter">
        <widget class="QPushButton" name="pushButton_2">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">border: 1px solid blue; color: black;
 font: 75 9pt &quot;Times New Roman&quot;;</string>
@@ -412,7 +499,7 @@ font: 75 9pt &quot;Times New Roman&quot;;</string>
        </widget>
       </item>
       <item>
-       <spacer name="verticalSpacer_7">
+       <spacer name="verticalSpacer_11">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
