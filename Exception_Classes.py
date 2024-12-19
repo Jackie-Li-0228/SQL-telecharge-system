@@ -27,3 +27,33 @@ class PaymentProcessingError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(self.message)
+
+class InvalidDateError(Exception):
+    """Exception raised when today is not the first day of the month."""
+    def __init__(self, message="Date Invalid."):
+        self.message = message
+        super().__init__(self.message)
+
+class UserNotAdminError(Exception):
+    """Exception raised when the user is not an admin."""
+    def __init__(self, message="User is not an admin."):
+        self.message = message
+        super().__init__(self.message)
+
+class NoLastMonthPackagesError(Exception):
+    """Exception raised when no packages for the last month are found."""
+    def __init__(self, message="No packages found for the last month."):
+        self.message = message
+        super().__init__(self.message)
+
+class NoValidPackageFoundError(Exception):
+    """Exception raised when no valid package is found for the current month."""
+    def __init__(self, message="No valid package found for the current month."):
+        self.message = message
+        super().__init__(self.message)
+
+class ValueError(Exception):
+    """Exception raised when a value is invalid."""
+    def __init__(self, message="Value is invalid"):
+        self.message = message
+        super().__init__(self.message)

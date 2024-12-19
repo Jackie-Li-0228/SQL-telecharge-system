@@ -56,7 +56,7 @@ CREATE TABLE PhoneAccounts (
     PackageStartTime DATETIME NOT NULL,    -- 套餐生效时间
     PackageEndTime DATETIME,               -- 套餐失效时间
     IDCardNumber CHAR(18),                 -- 外键，关联到用户表的身份证号
-    PackageID INT,                         -- 外键，关联到套餐表的套餐ID
+    PackageID VARCHAR(5),                         -- 外键，关联到套餐表的套餐ID
     Password VARCHAR(255) NOT NULL,         -- 密码字段
     UserTypeID INT,                        -- 用户类型ID，外键关联到UserTypes表
     FOREIGN KEY (PackageID) REFERENCES Packages(PackageID),
@@ -69,7 +69,7 @@ CREATE TABLE CallRecords (
     Caller CHAR(11) NOT NULL,              -- 呼出方电话号码
     CallTime DATETIME NOT NULL,            -- 通话时间
     Receiver CHAR(11) NOT NULL,            -- 接收方电话号码
-    CallDuration INT NOT NULL,             -- 通话时长（单位：秒）
+    CallDuration INT NOT NULL,             -- 通话时长（单位：分钟）
     FOREIGN KEY (Caller) REFERENCES PhoneAccounts(PhoneNumber),
     FOREIGN KEY (Receiver) REFERENCES PhoneAccounts(PhoneNumber)
 );

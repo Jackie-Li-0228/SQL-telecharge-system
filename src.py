@@ -70,12 +70,12 @@ def create_new_phone_account(phone_number, id_card_number, password, package_id=
 
 
 # 使用函数
-try:
-    create_new_phone_account("13812345678", "123456789012345678", "securepassword123")
-except UserNotFoundError as e:
-    print(f"User not found: {e}")
-except DatabaseError as e:
-    print(f"Database error: {e}")
+# try:
+#     create_new_phone_account("13812345678", "123456789012345678", "securepassword123")
+# except UserNotFoundError as e:
+#     print(f"User not found: {e}")
+# except DatabaseError as e:
+#     print(f"Database error: {e}")
 
 def make_payment(phone_number, amount, payment_method):
     """
@@ -91,6 +91,9 @@ def make_payment(phone_number, amount, payment_method):
     - PhoneNumberNotFoundError: If the phone number is not found in the database.
     - PaymentProcessingError: If there is an error during the payment processing (e.g., database issues).
     """
+    if amount <= 0:
+        # 充值额度不能为负数
+        raise ValueError("Payment amount must be greater than zero.")
 
     # 获取当前时间
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -104,7 +107,7 @@ def make_payment(phone_number, amount, payment_method):
         raise PhoneNumberNotFoundError(f"Phone number {phone_number} not found.")
 
     # 更新余额
-    new_balance = account[0] + Decimal(amount)
+    new_balance = account[0] + Decimal("{:.2f}".format(amount))
     
     try:
         # 更新电话号码的余额
@@ -130,12 +133,14 @@ def make_payment(phone_number, amount, payment_method):
         raise PaymentProcessingError(f"Error processing payment for phone number {phone_number}: {err}")
 
 # 使用函数
-try:
-    make_payment("13812345678", 50.00, "credit card")
-except PhoneNumberNotFoundError as e:
-    print(f"Error: {e}")
-except PaymentProcessingError as e:
-    print(f"Error: {e}")
+# try:
+#     make_payment("13812345678", 50.00, "credit card")
+# except PhoneNumberNotFoundError as e:
+#     print(f"Error: {e}")
+# except PaymentProcessingError as e:
+#     print(f"Error: {e}")
+# except ValueError as e:
+#     print(f"Error: {e}")
 
 
 def get_user_info_by_phone(phone_number):
@@ -181,11 +186,11 @@ def get_user_info_by_phone(phone_number):
 
 
 # 使用函数获取用户信息
-try:
-    user_info = get_user_info_by_phone("13812345678")
-    print(user_info)
-except PhoneNumberNotFoundError as e:
-    print(f"Error: {e}")
+# try:
+#     user_info = get_user_info_by_phone("13812345678")
+#     print(user_info)
+# except PhoneNumberNotFoundError as e:
+#     print(f"Error: {e}")
 
 def register_user(id_card_number, name, age, gender, user_type_name="普通用户"):
     """
@@ -229,12 +234,12 @@ def register_user(id_card_number, name, age, gender, user_type_name="普通用�
 
 
 # 使用示例
-try:
-    register_user("123456789012345678", "张三", 28, "M", "普通用户")
-except UserTypeNotFoundError as e:
-    print(f"Error: {e}")
-except DatabaseError as e:
-    print(f"Database error: {e}")
+# try:
+#     register_user("123456789012345678", "张三", 28, "M", "普通用户")
+# except UserTypeNotFoundError as e:
+#     print(f"Error: {e}")
+# except DatabaseError as e:
+#     print(f"Database error: {e}")
 
 def get_package_details(phone_number):
     """
@@ -291,13 +296,13 @@ def get_package_details(phone_number):
         # 捕获数据库错误并抛出异常
         raise DatabaseError(f"Error while fetching package details: {err}")
 
-try:
-    package_info = get_package_details("13812345678")
-    print(package_info)
-except PhoneNumberNotFoundError as e:
-    print(f"Error: {e}")
-except DatabaseError as e:
-    print(f"Database error: {e}")
+# try:
+#     package_info = get_package_details("13812345678")
+#     print(package_info)
+# except PhoneNumberNotFoundError as e:
+#     print(f"Error: {e}")
+# except DatabaseError as e:
+#     print(f"Database error: {e}")
 
 def get_available_packages():
     """
@@ -349,12 +354,12 @@ def get_available_packages():
         # 捕获数据库错误并抛出异常
         raise DatabaseError(f"Error while fetching available packages: {err}")
     
-try:
-    available_packages = get_available_packages()
-    for package in available_packages:
-        print(package)
-except DatabaseError as e:
-    print(f"Database error: {e}")
+# try:
+#     available_packages = get_available_packages()
+#     for package in available_packages:
+#         print(package)
+# except DatabaseError as e:
+#     print(f"Database error: {e}")
   
 def change_phone_package(phone_number, new_package_id):
     """
@@ -411,8 +416,149 @@ def change_phone_package(phone_number, new_package_id):
         db.rollback()
         raise DatabaseError(f"Error while changing package for phone number {phone_number}: {err}")
 
-try:
-    change_phone_package('13812345678', 2)
-except DatabaseError as e:
-    print(f"Database error: {e}")
+# try:
+#     change_phone_package('13812345678', 'T1')
+# except DatabaseError as e:
+#     print(f"Database error: {e}")
+
+def change_package_for_all(phone_number):
+    try:
+        # 获取今天的日期，判断是否是每月的第一天
+        current_date = datetime.now()
+        if current_date.day != 1:
+            raise InvalidDateError(message="You can only refresh the package on the first day of each month.")
+
+        # 查询手机号对应的用户类型ID
+        cursor.execute("""
+            SELECT UserTypeID FROM PhoneAccounts WHERE PhoneNumber = %s
+        """, (phone_number,))
+        result = cursor.fetchone()
+
+        if result is None:
+            raise PhoneNumberNotFoundError(message=f"Phone number {phone_number} not found in the system.")
+
+        user_type_id = result[0]
+
+        # 如果用户不是管理员
+        if user_type_id != 3:  # 假设3代表管理员
+            raise UserNotAdminError(message=f"The user associated with phone number {phone_number} is not an admin.")
+
+        # 获取上个月的信息
+        last_month = (current_date.month - 1) if current_date.month > 1 else 12
+        last_month_start = datetime(current_date.year, last_month, 1)
+
+        # 查询电话账户-服务表中的上个月套餐服务信息
+        cursor.execute("""
+            SELECT PhoneNumber, ServiceID, ActivationTime
+            FROM PhoneAccount_Services
+            WHERE ServiceID LIKE 'T%' AND ActivationTime >= %s AND ActivationTime < %s
+        """, (last_month_start, current_date))
+
+        services = cursor.fetchall()
+
+        # 如果没有找到上个月的套餐记录
+        if not services:
+            raise NoLastMonthPackagesError(message="No packages were found from the last month.")
+
+        # 使用字典保存每个手机号的最新套餐信息
+        package_updates = {}
+
+        # 遍历服务信息，找到每个手机号对应的最后一条套餐
+        for service in services:
+            phone_number = service[0]
+            if service[2] == datetime(current_date.year, current_date.month, 1):
+                # 获取套餐ID
+                new_package_id = service[1]
+                
+                # 保证只保存每个手机号的最新套餐
+                package_updates[phone_number] = (new_package_id, current_date)
+
+        # 如果没有找到有效的套餐
+        if not package_updates:
+            raise NoValidPackageFoundError(message="No valid packages found for updating any phone account.")
+
+        # 查询套餐的详细信息（包括合约期和语音额度）
+        cursor.execute("""
+            SELECT PackageID, ContractDuration, VoiceQuota
+            FROM Packages
+            WHERE PackageID IN (%s)
+        """, (",".join([package_updates[phone_number][0] for phone_number in package_updates]),))
+
+        packages = cursor.fetchall()
+        package_info_map = {pkg[0]: (pkg[1], pkg[2]) for pkg in packages}
+
+        # 更新所有手机号的套餐信息
+        for phone_number, (new_package_id, package_start_time) in package_updates.items():
+            # 获取对应套餐的合约期和语音额度
+            contract_duration, voice_quota = package_info_map.get(new_package_id, (None, None))
+
+            if contract_duration is None or voice_quota is None:
+                raise NoValidPackageFoundError(message=f"Package {new_package_id} is invalid or missing required details.")
+
+            # 计算套餐结束时间
+            package_end_time = package_start_time + timedelta(days=30 * contract_duration)  # 合约期按月计算
+
+            # 更新套餐信息
+            cursor.execute("""
+                UPDATE PhoneAccounts
+                SET PackageID = %s, PackageStartTime = %s, PackageEndTime = %s, VoiceBalance = %s
+                WHERE PhoneNumber = %s
+            """, (new_package_id, package_start_time, package_end_time, voice_quota, phone_number))
+
+        # 提交所有更新事务
+        db.commit()
+        print(f"Successfully updated {len(package_updates)} phone accounts to their new packages.")
+
+    except (PhoneNumberNotFoundError, UserNotAdminError, InvalidDateError, NoLastMonthPackagesError, NoValidPackageFoundError) as e:
+        print(f"Error occurred: {e}")
+        db.rollback()
+
+# try:
+#     change_package_for_all("13812345678")
+# except (PhoneNumberNotFoundError, UserNotAdminError, InvalidDateError, NoLastMonthPackagesError, NoValidPackageFoundError) as e:
+#     print(f"Error occurred: {e}")
+
+def record_call(caller, receiver, call_duration_minutes):
+    '''
+        给定主叫号码、被叫号码和通话时长，记录通话记录到数据库中。
+    '''
+    try:
+        # 检查号码是否有效
+        cursor.execute("SELECT 1 FROM PhoneAccounts WHERE PhoneNumber = %s", (caller,))
+        if cursor.fetchone() is None:
+            raise PhoneNumberNotFoundError(message=f"Caller phone number {caller} not found.")
+
+        cursor.execute("SELECT 1 FROM PhoneAccounts WHERE PhoneNumber = %s", (receiver,))
+        if cursor.fetchone() is None:
+            raise PhoneNumberNotFoundError(message=f"Receiver phone number {receiver} not found.")
+
+        # 获取当前时间作为通话时间
+        current_time = datetime.now()
+
+        # 插入通话记录到数据库
+        cursor.execute("""
+            INSERT INTO CallRecords (Caller, CallTime, Receiver, CallDuration)
+            VALUES (%s, %s, %s, %s)
+        """, (caller, current_time, receiver, call_duration_minutes))
+
+        # 提交事务
+        db.commit()
+        print(f"Call from {caller} to {receiver} recorded successfully.")
+    
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+        db.rollback()
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+        db.rollback()
+
+# 函数使用示例
+# caller = "13800000001"
+# receiver = "13800000002"
+# call_duration_minutes = 5  # 通话时长为5分钟
+
+# try:
+#     record_call(caller, receiver, call_duration_minutes)
+# except Exception as e:
+#     print(f"Error occurred: {e}")
 
