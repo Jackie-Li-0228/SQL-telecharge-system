@@ -69,7 +69,7 @@ CREATE TABLE CallRecords (
     Caller CHAR(11) NOT NULL,              -- 呼出方电话号码
     CallTime DATETIME NOT NULL,            -- 通话时间
     Receiver CHAR(11) NOT NULL,            -- 接收方电话号码
-    CallDuration INT NOT NULL,             -- 通话时长（单位：秒）
+    CallDuration INT NOT NULL,             -- 通话时长（单位：分钟）
     FOREIGN KEY (Caller) REFERENCES PhoneAccounts(PhoneNumber),
     FOREIGN KEY (Receiver) REFERENCES PhoneAccounts(PhoneNumber)
 );

@@ -424,15 +424,12 @@ except DatabaseError as e:
 import mysql.connector
 from datetime import datetime
 
-# 假设 db 和 cursor 已经被正确连接和初始化
-# db = mysql.connector.connect(...)
-
 def change_package_for_all(phone_number):
     try:
         # 获取今天的日期，判断是否是每月的第一天
         current_date = datetime.now()
         if current_date.day != 1:
-            raise InvalidDateError(message="You can only change the package on the first day of each month.")
+            raise InvalidDateError(message="You can only refresh the package on the first day of each month.")
 
         # 查询手机号对应的用户类型ID
         cursor.execute("""
@@ -523,3 +520,48 @@ try:
     change_package_for_all("13812345678")
 except (PhoneNumberNotFoundError, UserNotAdminError, InvalidDateError, NoLastMonthPackagesError, NoValidPackageFoundError) as e:
     print(f"Error occurred: {e}")
+
+def record_call(caller, receiver, call_duration_minutes):
+'''
+    给定主叫号码、被叫号码和通话时长，记录通话记录到数据库中。
+'''
+    try:
+        # 检查号码是否有效
+        cursor.execute("SELECT 1 FROM PhoneAccounts WHERE PhoneNumber = %s", (caller,))
+        if cursor.fetchone() is None:
+            raise PhoneNumberNotFoundError(message=f"Caller phone number {caller} not found.")
+
+        cursor.execute("SELECT 1 FROM PhoneAccounts WHERE PhoneNumber = %s", (receiver,))
+        if cursor.fetchone() is None:
+            raise PhoneNumberNotFoundError(message=f"Receiver phone number {receiver} not found.")
+
+        # 获取当前时间作为通话时间
+        current_time = datetime.now()
+
+        # 插入通话记录到数据库
+        cursor.execute("""
+            INSERT INTO CallRecords (Caller, CallTime, Receiver, CallDuration)
+            VALUES (%s, %s, %s, %s)
+        """, (caller, current_time, receiver, call_duration_minutes))
+
+        # 提交事务
+        db.commit()
+        print(f"Call from {caller} to {receiver} recorded successfully.")
+    
+    except PhoneNumberNotFoundError as e:
+        print(f"Error: {e}")
+        db.rollback()
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+        db.rollback()
+
+# 函数使用示例
+caller = "13800000001"
+receiver = "13800000002"
+call_duration_minutes = 5  # 通话时长为5分钟
+
+try:
+    record_call(caller, receiver, call_duration_minutes)
+except Exception as e:
+    print(f"Error occurred: {e}")
+
