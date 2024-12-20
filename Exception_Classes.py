@@ -74,3 +74,8 @@ class PhoneSuspendedError(Exception):
     def __init__(self, message="The phone number is suspended."):
         self.message = message
         super().__init__(self.message)
+
+class ObjectNotFoundError(Exception):
+    def __init__(self, message="Object not found."):
+        self.message = message
+        super().__init__(self.message)
