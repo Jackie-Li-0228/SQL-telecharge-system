@@ -459,7 +459,7 @@ class TelechargeSystem:
 
             # 获取上个月的信息
             last_month = (current_date.month - 1) if current_date.month > 1 else 12
-            last_month_start = datetime(current_date.year, last_month, 1)
+            last_month_start = datetime(current_date.year, last_month, 1) if current_date.month > 1 else datetime(current_date.year - 1, 12, 1)
 
             # 查询电话账户-服务表中的上个月套餐服务信息
             self.cursor.execute("""
@@ -689,7 +689,7 @@ class TelechargeSystem:
     # except Exception as e:
     #     print(f"An error occurred: {e}")
 
-    def get_call_records_by_phone(self,phone_number):
+    def get_call_records_by_phone(self,phone_number,year=None,month=None):
         """
         获取与手机号相关的所有通话记录，包括呼出和被呼出的记录
         
@@ -709,25 +709,36 @@ class TelechargeSystem:
             call_records = self.cursor.fetchall()
             
             if not call_records:
-                raise PhoneNumberNotFoundError(f"No call records found for phone number {phone_number}.")
+                raise ObjectNotFoundError(f"No call records found for phone number {phone_number}.")
             
             # 格式化通话记录并返回
             records = []
             for record in call_records:
                 call_id, call_time, call_duration, caller, receiver = record
-                records.append({
-                    "CallID": call_id,
-                    "CallTime": call_time,
-                    "CallDuration": call_duration,
-                    "Caller": caller,
-                    "Receiver": receiver
-                })
-            
+                if year is not None and month is not None: 
+                    if month == call_time.month and year == call_time.year:
+                        records.append({
+                            "CallID": call_id,
+                            "CallTime": call_time,
+                            "CallDuration": call_duration,
+                            "Caller": caller,
+                            "Receiver": receiver
+                        })
+                else:
+                    records.append({
+                        "CallID": call_id,
+                        "CallTime": call_time,
+                        "CallDuration": call_duration,
+                        "Caller": caller,
+                        "Receiver": receiver
+                    })
+            if not records:
+                raise ObjectNotFoundError(f"No call records found for phone number {phone_number} in the given month.")
             return records
         
         except mysql.connector.Error as err:
             print(f"Database error: {err}")
-        except PhoneNumberNotFoundError as e:
+        except ObjectNotFoundError as e:
             print(f"Error: {e}")
 
     # 示例：获取某个手机号的所有通话记录
@@ -742,7 +753,7 @@ class TelechargeSystem:
     # except Exception as e:
     #     print(f"An error occurred: {e}")
 
-    def get_payment_records_by_phone(self,phone_number):
+    def get_payment_records_by_phone(self,phone_number,year=None,month=None):
         """
         获取与手机号相关的所有缴费记录
         
@@ -762,25 +773,36 @@ class TelechargeSystem:
             payment_records = self.cursor.fetchall()
             
             if not payment_records:
-                raise PhoneNumberNotFoundError(f"No payment records found for phone number {phone_number}.")
+                raise ObjectNotFoundError(f"No payment records found for phone number {phone_number}.")
             
             # 格式化缴费记录并返回
             records = []
             for record in payment_records:
                 payment_id, payment_time, amount, payment_method, phone_number = record
-                records.append({
-                    "PaymentID": payment_id,
-                    "PaymentTime": payment_time,
-                    "Amount": amount,
-                    "PaymentMethod": payment_method,
-                    "PhoneNumber": phone_number
-                })
-            
+                if year is not None and month is not None:
+                    if month == payment_time.month and year == payment_time.year:
+                        records.append({
+                            "PaymentID": payment_id,
+                            "PaymentTime": payment_time,
+                            "Amount": amount,
+                            "PaymentMethod": payment_method,
+                            "PhoneNumber": phone_number
+                        })
+                else:
+                    records.append({
+                        "PaymentID": payment_id,
+                        "PaymentTime": payment_time,
+                        "Amount": amount,
+                        "PaymentMethod": payment_method,
+                        "PhoneNumber": phone_number
+                    })
+            if not records:
+                raise ObjectNotFoundError(f"No payment records found for phone number {phone_number} in the given month.")
             return records
         
         except mysql.connector.Error as err:
             print(f"Database error: {err}")
-        except PhoneNumberNotFoundError as e:
+        except ObjectNotFoundError as e:
             print(f"Error: {e}")
             return []
 
@@ -796,7 +818,7 @@ class TelechargeSystem:
     # except Exception as e:
     #     print(f"An error occurred: {e}")
 
-    def get_transaction_records_by_phone(self,phone_number):
+    def get_transaction_records_by_phone(self,phone_number,year=None,month=None):
         """
         获取与手机号相关的所有交易记录
         
@@ -816,25 +838,36 @@ class TelechargeSystem:
             transaction_records = self.cursor.fetchall()
             
             if not transaction_records:
-                raise PhoneNumberNotFoundError(f"No transaction records found for phone number {phone_number}.")
+                raise ObjectNotFoundError(f"No transaction records found for phone number {phone_number}.")
             
             # 格式化交易记录并返回
             records = []
             for record in transaction_records:
                 transaction_id, transaction_time, purchased_item, amount, phone_number = record
-                records.append({
-                    "TransactionID": transaction_id,
-                    "TransactionTime": transaction_time,
-                    "PurchasedItem": purchased_item,
-                    "Amount": amount,
-                    "PhoneNumber": phone_number
-                })
-            
+                if year is not None and month is not None:
+                    if month == transaction_time.month and year == transaction_time.year:
+                        records.append({
+                            "TransactionID": transaction_id,
+                            "TransactionTime": transaction_time,
+                            "PurchasedItem": purchased_item,
+                            "Amount": amount,
+                            "PhoneNumber": phone_number
+                        })
+                else:
+                    records.append({
+                        "TransactionID": transaction_id,
+                        "TransactionTime": transaction_time,
+                        "PurchasedItem": purchased_item,
+                        "Amount": amount,
+                        "PhoneNumber": phone_number
+                    })
+            if not records:
+                raise ObjectNotFoundError(f"No transaction records found for phone number {phone_number} in the given month.")
             return records
         
         except mysql.connector.Error as err:
             print(f"Database error: {err}")
-        except PhoneNumberNotFoundError as e:
+        except ObjectNotFoundError as e:
             print(f"Error: {e}")
             return []
 
@@ -850,7 +883,7 @@ class TelechargeSystem:
     # except Exception as e:
     #     print(f"An error occurred: {e}")
 
-    def get_services_by_phone(self,phone_number):
+    def get_services_by_phone(self,phone_number,year=None,month=None):
         """
         获取与手机号相关的所有手机号-服务表记录
         
@@ -870,25 +903,36 @@ class TelechargeSystem:
             service_records = self.cursor.fetchall()
             
             if not service_records:
-                raise PhoneNumberNotFoundError(f"No service records found for phone number {phone_number}.")
+                raise ObjectNotFoundError(f"No service records found for phone number {phone_number}.")
             
             # 格式化服务记录并返回
             records = []
             for record in service_records:
                 phone_service_id, purchase_time, activation_time, phone_number, service_id = record
-                records.append({
-                    "PhoneServiceID": phone_service_id,
-                    "PurchaseTime": purchase_time,
-                    "ActivationTime": activation_time,
-                    "PhoneNumber": phone_number,
-                    "ServiceID": service_id
-                })
-            
+                if year is not None and month is not None:
+                    if month == purchase_time.month and year == purchase_time.year:
+                        records.append({
+                            "PhoneServiceID": phone_service_id,
+                            "PurchaseTime": purchase_time,
+                            "ActivationTime": activation_time,
+                            "PhoneNumber": phone_number,
+                            "ServiceID": service_id
+                        })
+                else:
+                    records.append({
+                        "PhoneServiceID": phone_service_id,
+                        "PurchaseTime": purchase_time,
+                        "ActivationTime": activation_time,
+                        "PhoneNumber": phone_number,
+                        "ServiceID": service_id
+                    })
+            if not records:
+                raise ObjectNotFoundError(f"No service records found for phone number {phone_number} in the given month.")
             return records
         
         except mysql.connector.Error as err:
             print(f"Database error: {err}")
-        except PhoneNumberNotFoundError as e:
+        except ObjectNotFoundError as e:
             print(f"Error: {e}")
             return []
 
