@@ -354,6 +354,7 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             if amount <= 0 or amount > 1000:
                 QtWidgets.QMessageBox.warning(self, "输入错误", "充值金额必须大于0且小于等于1000。")
+                amount = None
         except InvalidOperation:
             QtWidgets.QMessageBox.warning(self, "数值异常", "请输入有效的金额。")
             return
