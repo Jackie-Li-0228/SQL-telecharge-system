@@ -2,6 +2,12 @@ import mysql.connector
 from datetime import datetime,timedelta
 from decimal import Decimal
 from Exception_Classes import *
+import re
+
+SQL_KEYWORDS = {
+    'select', 'insert', 'delete', 'update', 'drop', 'alter', 'create', 'where', 'from', 'join',
+    'and', 'or', 'group', 'by', 'having', 'order', 'limit', 'like', 'union', 'into', 'values'
+}
 
 class TelechargeSystem:
     def __init__(self,db=None,cursor=None):
@@ -14,6 +20,72 @@ class TelechargeSystem:
         )
         self.cursor = self.db.cursor()
 
+    def check_input_format(input_data, format_str):
+        # 1. SQL关键字检查
+        if any(keyword in str(input_data).lower() for keyword in SQL_KEYWORDS):
+            raise InputCheckFailed("Input contains SQL keywords.")
+
+        # 2. 解析format字符串
+        format_parts = format_str.split()
+        if not format_parts:
+            raise InputCheckFailed("Format string is empty.")
+
+        # 获取类型检查部分
+        input_type = format_parts[0].upper()
+        if input_type not in ['S', 'I']:
+            raise InputCheckFailed(f"Invalid type {input_type} in format.")
+
+        # 解析选项部分
+        options = format_parts[1:]
+
+        # 3. 检查输入类型
+        if input_type == 'S':
+            # 字符串检查
+            if not isinstance(input_data, str):
+                raise InputCheckFailed(f"Expected a string but got {type(input_data).__name__}.")
+            for option in options:
+                if option.startswith("%"):
+                    prefix = option[1:]
+                    if not input_data.startswith(prefix):
+                        raise InputCheckFailed(f"String does not start with '{prefix}'.")
+                elif option.startswith(":"):
+                    length = int(option[1:])
+                    if len(input_data) != length:
+                        raise InputCheckFailed(f"String length must be {length}.")
+        elif input_type == 'I':
+            # 数字检查（允许小数）
+            if not isinstance(input_data, (int, float, str)):
+                raise InputCheckFailed(f"Expected a number but got {type(input_data).__name__}.")
+            # 转为字符串后检查
+            input_data = str(input_data)
+
+            # 检查是否为有效的数字（可以包含一个小数点）
+            if not re.match(r'^\d+(\.\d+)?$', input_data):
+                raise InputCheckFailed(f"Invalid number format: {input_data}.")
+
+            for option in options:
+                if option.startswith("%"):
+                    prefix = option[1:]
+                    if not input_data.startswith(prefix):
+                        raise InputCheckFailed(f"Number does not start with '{prefix}'.")
+                elif option.startswith(":"):
+                    length = int(option[1:])
+                    if len(input_data) != length:
+                        raise InputCheckFailed(f"Number length must be {length}.")
+                elif option.startswith("."):
+                    # 检查小数点后的位数
+                    decimal_places = int(option[1:])
+                    if '.' in input_data:
+                        # 获取小数点后面的位数
+                        actual_decimal_places = len(input_data.split('.')[1])
+                        if actual_decimal_places > decimal_places:
+                            raise InputCheckFailed(f"Number has more than {decimal_places} decimal places.")
+                    else:
+                        # 如果没有小数点，确保没有多于的位数
+                        if decimal_places > 0:
+                            raise InputCheckFailed(f"Number should have exactly {decimal_places} decimal places.")
+                    
+                    
     def create_new_phone_account(self,phone_number, name, id_card_number, password, package_id=None):
         """
         Function to create a new phone account with the given phone number, ID card, and password.
@@ -1063,7 +1135,14 @@ class TelechargeSystem:
     def subscribe_service(self, phone_number, service_id):
         # 查询业务信息
         self.cursor.execute("""
-            SELECT ServiceID, Price, ActivationMethodID FROM Services WHERE ServiceID = %s
+            SELECT IsSuspended FROM PhoneAccounts WHERE PhoneNumber = %s
+        """, (phone_number,))
+        suspend = self.cursor.fetchone()
+        if suspend[0] < 0:
+            raise PhoneSuspendedError(f"Phone number {phone_number} is suspended.")
+
+        self.cursor.execute("""
+            SELECT ServiceID, Price, Quota,ActivationMethodID FROM Services WHERE ServiceID = %s
         """, (service_id,))
         service = self.cursor.fetchone()
         
@@ -1071,7 +1150,7 @@ class TelechargeSystem:
         if service is None:
             raise NoValidServiceFoundError(f"Service with ServiceID {service_id} not found.")
         
-        service_id, price, activation_method_id = service
+        service_id, price,quota, activation_method_id = service
         
         # 获取当前时间
         current_time = datetime.now()
@@ -1082,13 +1161,19 @@ class TelechargeSystem:
                 UPDATE PhoneAccounts 
                 SET Balance = Balance - %s
                 WHERE PhoneNumber = %s
-            """, (price, phone_number, price))
+            """, (price, phone_number,))
             
             # 创建交易记录
             self.cursor.execute("""
                 INSERT INTO TransactionRecords (TransactionTime, PurchasedItem, Amount, PhoneNumber)
                 VALUES (%s, %s, %s, %s)
             """, (current_time, service_id, price, phone_number))
+
+            self.cursor.execute("""
+                UPDATE PhoneAccounts 
+                SET VoiceBalance = VoiceBalance + %s
+                WHERE PhoneNumber = %s
+            """, (quota, phone_number,))
             
             # 提交事务
             self.db.commit()
@@ -1150,8 +1235,8 @@ class TelechargeSystem:
         total_cost = 0
         
         if voice_balance >= call_duration_in_minutes:
-            print("Im here 1",call_duration_in_minutes,caller_number)
-            print(f"UPDATE PhoneAccounts SET VoiceBalance = VoiceBalance - {call_duration_in_minutes} WHERE PhoneNumber = {caller_number}")
+            # print("Im here 1",call_duration_in_minutes,caller_number)
+            # print(f"UPDATE PhoneAccounts SET VoiceBalance = VoiceBalance - {call_duration_in_minutes} WHERE PhoneNumber = {caller_number}")
             # 语音余额足够，资费为0
             total_cost = 0
             self.cursor.execute("""
@@ -1161,8 +1246,8 @@ class TelechargeSystem:
             """, (call_duration_in_minutes, caller_number,))
         else:
             # 语音余额不足，超出部分需要扣费
-            print("Im here 2",call_duration_in_minutes,caller_number)
-            print(f"UPDATE PhoneAccounts SET VoiceBalance = 0 WHERE PhoneNumber = {caller_number}")
+            # print("Im here 2",call_duration_in_minutes,caller_number)
+            # print(f"UPDATE PhoneAccounts SET VoiceBalance = 0 WHERE PhoneNumber = {caller_number}")
             total_cost = (call_duration_in_minutes - voice_balance) * over_quota_standard
             self.cursor.execute("""
                 UPDATE PhoneAccounts
@@ -1194,3 +1279,4 @@ class TelechargeSystem:
     #     print(f"Error: {e}")
     # except ValueError as e:
     #     print(f"Error: {e}")
+    
