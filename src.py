@@ -1020,7 +1020,7 @@ class TelechargeSystem:
             self.cursor.execute("""
                 UPDATE PhoneAccounts 
                 SET Balance = Balance - %s
-                WHERE PhoneNumber = %s AND Balance >= %s
+                WHERE PhoneNumber = %s
             """, (price, phone_number, price))
             
             # 创建交易记录
