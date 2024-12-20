@@ -5,22 +5,21 @@ from PyQt6 import QtWidgets, uic
 from Exception_Classes import *
 from src import TelechargeSystem
 from user_page import UserInterface
-from server_page import CustomerServiceInterface
+from service_page import CustomerServiceInterface
+from admin_page import AdminInterface
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # 构建UI文件的绝对路径
         ui_path = os.path.join(os.path.dirname(__file__), 'src', 'telecharge.ui')
         if not os.path.exists(ui_path):
             QtWidgets.QMessageBox.critical(self, "错误", f"找不到UI文件: {ui_path}")
             sys.exit(1)
 
-        # 加载UI文件
         uic.loadUi(ui_path, self)
         
-                # 获取tabWidget并隐藏Tab栏
+        # 获取tabWidget并隐藏Tab栏
         self.tabWidget = self.findChild(QtWidgets.QTabWidget, 'tabWidget')
         if self.tabWidget:
             self.tabWidget.tabBar().setVisible(False)
@@ -35,7 +34,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # 初始化界面
         self.user_interface = UserInterface(self)
-        self.customer_service_interface = CustomerServiceInterface(self)
+        self.service_interface = CustomerServiceInterface(self)
+        self.admin_interface = AdminInterface(self)
 
         # 登录界面按钮
         self.loginButton.clicked.connect(self.login)
@@ -46,7 +46,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.backtologinButton.clicked.connect(self.backtologin)
 
     def login(self):
-        # 登录逻辑
         phone = self.loginTeleNumberEdit.text().strip()
         password = self.loginSecretEdit.text().strip()
 
@@ -89,7 +88,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     if user_type == '普通用户':
                         self.user_interface.show()
                     elif user_type == '客服':
-                        self.customer_service_interface.show()
+                        self.service_interface.show()
+                    elif user_type == '管理员':
+                        self.admin_interface.show()
                     else:
                         raise ValueError("未知的用户类型。")
 

@@ -9,14 +9,12 @@ class UserInterface:
         self.setup_ui()
 
     def setup_ui(self):
-        # 用户界面组件
         self.main_window.myPackageButton.clicked.connect(self.show_my_package)
         self.main_window.balanceButton.clicked.connect(self.show_balance)
         self.main_window.callBalanceButton.clicked.connect(self.show_call_balance)
         self.main_window.rechargeButton.clicked.connect(self.switch_to_recharge)
         self.main_window.billInquiryButton.clicked.connect(self.switch_to_bill_inquiry)
         self.main_window.businessHandlingButton.clicked.connect(self.switch_to_business_handling)
-
         self.main_window.logoutButton_user.clicked.connect(self.logout)
 
     def show(self):
@@ -93,7 +91,6 @@ class UserInterface:
                 self.billTableWidget.setItem(row, 1, QtWidgets.QTableWidgetItem(str(record['TransactionTime'])))
                 self.billTableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(record['PurchasedItem']))
                 self.billTableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(f"{record['Amount']}元"))
-            # 设置表格为只读
             self.billTableWidget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
             self.billTableWidget.horizontalHeader().setStretchLastSection(True)
             self.billTableWidget.resizeColumnsToContents()
@@ -162,7 +159,6 @@ class UserInterface:
                 self.billTableWidget.setItem(row, 1, QtWidgets.QTableWidgetItem(str(record['TransactionTime'])))
                 self.billTableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(record['PurchasedItem']))
                 self.billTableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(f"{record['Amount']}元"))
-            # 设置表格为只读
             self.billTableWidget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
             self.billTableWidget.horizontalHeader().setStretchLastSection(True)
             self.billTableWidget.resizeColumnsToContents()
