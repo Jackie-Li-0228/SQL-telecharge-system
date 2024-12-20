@@ -44,6 +44,13 @@ class MainWindow(QtWidgets.QMainWindow):
         # 注册界面按钮
         self.registerButton.clicked.connect(self.register)
         self.backtologinButton.clicked.connect(self.backtologin)
+        
+        # 账号停机判定
+        self.accountStatusLabel = self.findChild(QtWidgets.QLabel, 'accountStatusLabel_user')
+        if self.accountStatusLabel:
+            self.accountStatusLabel.setText("状态: ")
+        else:
+            QtWidgets.QMessageBox.critical(self, "错误", "找不到accountStatusLabel_user控件")
 
     def login(self):
         phone = self.loginTeleNumberEdit.text().strip()
@@ -75,7 +82,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 user_status = result.get('IsSuspended', '0')
                 if user_status == '1':
                     QtWidgets.QMessageBox.warning(self, "账号已停机。")
+                    if hasattr(self, 'accountStatusLabel'):
+                        self.accountStatusLabel.setText("状态: 停机")
                 else:
+                    if hasattr(self, 'accountStatusLabel'):
+                        self.accountStatusLabel.setText("状态: 正常")
                     user_type_id = result['UserTypeID']
                     cursor.execute("SELECT UserTypeName FROM UserTypes WHERE UserTypeID=%s", (user_type_id,))
                     user_type_result = cursor.fetchone()
@@ -89,7 +100,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         self.user_interface.show()
                     elif user_type == '客服':
                         self.service_interface.show()
-                    elif user_type == '管理员':
+                    elif user_type == '超级管理员':
                         self.admin_interface.show()
                     else:
                         raise ValueError("未知的用户类型。")

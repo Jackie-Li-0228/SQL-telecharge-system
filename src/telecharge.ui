@@ -55,7 +55,7 @@
        </string>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tab_login">
        <property name="styleSheet">
@@ -1081,6 +1081,191 @@ padding: 5px;</string>
        <attribute name="title">
         <string>Admin</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_8"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_21">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="adminFetchButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+            </property>
+            <property name="text">
+             <string>查找</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="adminPhoneEdit">
+            <property name="styleSheet">
+             <string notr="true">border: 2px solid #000000;
+border-radius: 10px;
+background-color: #FFFFFF;
+color: #000000;
+padding: 5px;</string>
+            </property>
+            <property name="placeholderText">
+             <string>输入查询手机号</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_22">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="2" column="1">
+           <widget class="QTableWidget" name="adminAllServicesWidget">
+            <property name="styleSheet">
+             <string notr="true">QTableWidget {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 5px;
+}
+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="removeServiceButton">
+            <property name="styleSheet">
+             <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+            </property>
+            <property name="text">
+             <string>下架业务</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QTableWidget" name="adminAllPackagesWidget">
+            <property name="styleSheet">
+             <string notr="true">QTableWidget {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 5px;
+}
+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QTableWidget" name="adminInfoWidget">
+            <property name="styleSheet">
+             <string notr="true">QTableWidget {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 5px;
+}
+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QTableWidget" name="adminTransactionsWidget">
+            <property name="styleSheet">
+             <string notr="true">QTableWidget {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 5px;
+}
+</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="removePackageButton">
+            <property name="styleSheet">
+             <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+            </property>
+            <property name="text">
+             <string>下架套餐</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QPushButton" name="publishPackageButton">
+            <property name="styleSheet">
+             <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+            </property>
+            <property name="text">
+             <string>发布套餐</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QPushButton" name="publishServiceButton">
+            <property name="styleSheet">
+             <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+            </property>
+            <property name="text">
+             <string>发布业务</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_recharge">
        <property name="styleSheet">

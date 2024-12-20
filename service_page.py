@@ -9,18 +9,35 @@ class CustomerServiceInterface:
         self.setup_ui()
 
     def setup_ui(self):
-        self.main_window.customerServiceButton.clicked.connect(self.fetch_customer_service_info)
+        self.customerServicePhoneEdit = self.main_window.findChild(QtWidgets.QLineEdit, 'customerServicePhoneEdit')
+        self.customerServiceButton = self.main_window.findChild(QtWidgets.QPushButton, 'customerServiceButton')
+        self.customerServiceInfoWidget = self.main_window.findChild(QtWidgets.QWidget, 'customerServiceInfoWidget')
+        self.customerServiceTransactionsWidget = self.main_window.findChild(QtWidgets.QWidget, 'customerServiceTransactionsWidget')
+        self.allPackagesWidget = self.main_window.findChild(QtWidgets.QWidget, 'allPackagesWidget')
+        self.allServicesWidget = self.main_window.findChild(QtWidgets.QWidget, 'allServicesWidget')
+        
+        # 展示所有套餐
+        self.display_all_packages()
+
+        # 展示所有业务
+        self.display_all_services()
+
+        if self.customerServiceButton:
+            self.customerServiceButton.clicked.connect(self.fetch_customer_service_info)
+        else:
+            QtWidgets.QMessageBox.critical(self.main_window, "错误", "找不到customerServiceButton控件")
+        
+    def show(self):
+        self.main_window.tabWidget.setCurrentIndex(4)
 
     def fetch_customer_service_info(self):
         phone = self.customerServicePhoneEdit.text().strip()
         if not phone:
-            QtWidgets.QMessageBox.warning(self, "输入错误", "请输入电话号码。")
+            QtWidgets.QMessageBox.warning(self.main_window, "输入错误", "请输入电话号码。")
             return
         try:
             user_info = self.system.get_user_info_by_phone(phone)
             transaction_records = self.system.get_transaction_records_by_phone(phone)
-            packages = self.system.get_available_packages()
-            services = self.system.get_available_services()
 
             # 展示用户信息
             self.display_user_info(user_info)
@@ -28,19 +45,13 @@ class CustomerServiceInterface:
             # 展示交易记录
             self.display_transaction_records(transaction_records)
 
-            # 展示所有套餐
-            self.display_all_packages(packages)
-
-            # 展示所有业务
-            self.display_all_services(services)
-
-            QtWidgets.QMessageBox.information(self, "信息获取成功", "已成功获取并展示相关信息。")
+            QtWidgets.QMessageBox.information(self.main_window, "信息获取成功", "已成功获取并展示相关信息。")
         except PhoneNumberNotFoundError as e:
-            QtWidgets.QMessageBox.warning(self, "错误", str(e))
+            QtWidgets.QMessageBox.warning(self.main_window, "错误", str(e))
         except DatabaseError as e:
-            QtWidgets.QMessageBox.critical(self, "数据库错误", str(e))
+            QtWidgets.QMessageBox.critical(self.main_window, "数据库错误", str(e))
         except Exception as e:
-            QtWidgets.QMessageBox.critical(self, "错误", str(e))
+            QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
 
     def display_user_info(self, user_info):
         layout = self.customerServiceInfoWidget.layout()
@@ -83,7 +94,7 @@ class CustomerServiceInterface:
         table.resizeColumnsToContents()
         layout.addWidget(table)
 
-    def display_all_packages(self, packages):
+    def display_all_packages(self):
         layout = self.allPackagesWidget.layout()
         if not layout:
             layout = QtWidgets.QVBoxLayout()
@@ -93,7 +104,7 @@ class CustomerServiceInterface:
                 child = layout.takeAt(0)
                 if child.widget():
                     child.widget().deleteLater()
-
+        packages = self.system.get_available_packages()
         table = QtWidgets.QTableWidget()
         headers = ['PackageID', 'PackageName', 'PackagePrice', 'LaunchTime', 'ExpirationTime', 'ContractDuration',     'VoiceQuota', 'OverQuotaStandard']
         table.setColumnCount(len(headers))
@@ -113,7 +124,7 @@ class CustomerServiceInterface:
         table.resizeColumnsToContents()
         layout.addWidget(table)
 
-    def display_all_services(self, services):
+    def display_all_services(self):
         layout = self.allServicesWidget.layout()
         if not layout:
             layout = QtWidgets.QVBoxLayout()
@@ -123,7 +134,7 @@ class CustomerServiceInterface:
                 child = layout.takeAt(0)
                 if child.widget():
                     child.widget().deleteLater()
-
+        services = self.system.get_available_services()
         table = QtWidgets.QTableWidget()
         headers = ['ServiceID', 'ServiceName', 'Price', 'Quota', 'ActivationMethodID']
         table.setColumnCount(len(headers))
