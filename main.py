@@ -47,6 +47,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.rechargeButton.clicked.connect(self.switch_to_recharge)
         self.billInquiryButton.clicked.connect(self.switch_to_bill_inquiry)
         self.businessHandlingButton.clicked.connect(self.switch_to_business_handling)
+        
+        # 用户界面新增组件
+        self.accountStatusLabel = self.findChild(QtWidgets.QLabel, 'accountStatusLabel_user')
+        if self.accountStatusLabel:
+            self.accountStatusLabel.setText("状态: ")
+        else:
+            QtWidgets.QMessageBox.critical(self, "错误", "找不到accountStatusLabel_user控件")
+        
+        self.logoutButton_user = self.findChild(QtWidgets.QPushButton, 'logoutButton_user')
+        if self.logoutButton_user:
+            self.logoutButton_user.clicked.connect(self.logout)
+        else:
+            QtWidgets.QMessageBox.critical(self, "错误", "找不到logoutButton_user控件")
+
 
         # 充值界面按钮
         self.confirmRechargeButton.clicked.connect(self.confirm_recharge)
@@ -89,8 +103,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 cursorclass=pymysql.cursors.DictCursor
             )
             with connection.cursor() as cursor:
-                # 查询用户类型和密码
-                sql = "SELECT UserTypeID, Password FROM PhoneAccounts WHERE PhoneNumber=%s"
+                # 查询用户类型、密码和状态
+                sql = "SELECT UserTypeID, Password, IsSuspended FROM PhoneAccounts WHERE PhoneNumber=%s"
                 cursor.execute(sql, (phone,))
                 result = cursor.fetchone()
 
@@ -99,6 +113,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 if result['Password'] != password:
                     raise ValueError("密码错误。")
+
+                user_status = result.get('IsSuspended', '0')
+                if user_status == '1':
+                    QtWidgets.QMessageBox.warning(self, "账号已停机。")
+                    if hasattr(self, 'accountStatusLabel'):
+                        self.accountStatusLabel.setText("状态: 停机")
+                else:
+                    if hasattr(self, 'accountStatusLabel'):
+                        self.accountStatusLabel.setText("状态: 正常")
+
 
                 user_type_id = result['UserTypeID']
 
@@ -121,10 +145,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 else:
                     raise ValueError("未知的用户类型。")
 
+                self.current_user_phone = phone
+
         except UserNotFoundError as e:
             QtWidgets.QMessageBox.warning(self, "登录失败，用户不存在", str(e))
         except ValueError as e:
-            QtWidgets.QMessageBox.warning(self, "登录失败，密码错误", str(e))
+            QtWidgets.QMessageBox.warning(self, "登录失败", str(e))
         except pymysql.MySQLError as e:
             QtWidgets.QMessageBox.critical(self, "数据库错误", str(e))
         except Exception as e:
@@ -238,7 +264,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 if self.billTableLayout:
                     self.billTableLayout.addWidget(self.billTableWidget)
                 else:
-                    QtWidgets.QMessageBox.critical(self, "错误", "找不到账单表格布局billTableLayout")
+                    QtWidgets.QMessageBox.critical(self, "错误", "找到账单表格布局billTableLayout")
                     return
             headers = ['交易ID', '时间', '项目', '金额']
             self.billTableWidget.setColumnCount(len(headers))
@@ -361,12 +387,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # 检查小数位数
         if amount.as_tuple().exponent < -2:
-            QtWidgets.QMessageBox.warning(self, "输入错误", "请输入有效的金额。")
+            QtWidgets.QMessageBox.warning(self, "输入错误", "充值金额最多有两位小数。")
             return
 
         confirmation = QtWidgets.QMessageBox.question(
             self, "确认充值", f"确定要充值{amount}元到号码{phone}吗？",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.   QMessageBox.StandardButton.No
+            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         )
         if confirmation == QtWidgets.QMessageBox.StandardButton.Yes:
             try:
@@ -460,6 +486,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.selected_package = None
             else:
                 self.selected_service = None
+
     def package_item_changed(self, item):
         if item.column() == 0:
             if item.checkState() == QtCore.Qt.CheckState.Checked:
@@ -484,6 +511,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.selected_service = None
             else:
                 self.selected_package = None
+
+    def logout(self):
+        self.current_user_phone = None
+        self.loginTeleNumberEdit.clear()
+        self.loginSecretEdit.clear()
+        if hasattr(self, 'accountStatusLabel'):
+            self.accountStatusLabel.setText("状态: ")
+            self.accountStatusLabel.setStyleSheet("color: black;")
+        self.tabWidget.setCurrentIndex(0)
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

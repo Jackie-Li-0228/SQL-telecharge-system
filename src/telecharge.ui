@@ -54,7 +54,7 @@
        </string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_login">
        <property name="styleSheet">
@@ -845,10 +845,10 @@ padding: 5px;</string>
        <widget class="QLabel" name="tab3_Label">
         <property name="geometry">
          <rect>
-          <x>80</x>
-          <y>160</y>
-          <width>300</width>
-          <height>161</height>
+          <x>140</x>
+          <y>180</y>
+          <width>201</width>
+          <height>150</height>
          </rect>
         </property>
         <property name="sizePolicy">
@@ -874,6 +874,39 @@ padding: 5px;</string>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="accountStatusLabel_user">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>140</y>
+          <width>81</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="logoutButton_user">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>310</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Log out</string>
         </property>
        </widget>
       </widget>
