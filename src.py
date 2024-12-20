@@ -1135,6 +1135,13 @@ class TelechargeSystem:
     def subscribe_service(self, phone_number, service_id):
         # 查询业务信息
         self.cursor.execute("""
+            SELECT IsSuspended FROM PhoneAccounts WHERE PhoneNumber = %s
+        """, (phone_number,))
+        suspend = self.cursor.fetchone()
+        if suspend[0] < 0:
+            raise PhoneSuspendedError(f"Phone number {phone_number} is suspended.")
+
+        self.cursor.execute("""
             SELECT ServiceID, Price, Quota,ActivationMethodID FROM Services WHERE ServiceID = %s
         """, (service_id,))
         service = self.cursor.fetchone()
