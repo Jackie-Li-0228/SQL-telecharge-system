@@ -26,14 +26,18 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             QtWidgets.QMessageBox.critical(self, "错误", "找不到tabWidget控件")
             sys.exit(1)
+            
+        # 初始化TelechargeSystem实例
+        self.system = TelechargeSystem()
+        self.current_user_phone = None
 
-        # 连接登录和注册按钮
+        # 绑定登录和注册按钮
         self.loginButton.clicked.connect(self.login)
         self.gotoregisterButton.clicked.connect(self.gotoregister)
         self.registerButton.clicked.connect(self.register)
-        self.backtologinButton.clicked.connect(self.backtoLogin)
+        self.backtologinButton.clicked.connect(self.backtologin)
 
-        # 连接用户界面按钮
+        # 用户界面按钮
         self.myPackageButton.clicked.connect(self.show_my_package)
         self.balanceButton.clicked.connect(self.show_balance)
         self.callBalanceButton.clicked.connect(self.show_call_balance)
@@ -41,21 +45,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.billInquiryButton.clicked.connect(self.switch_to_bill_inquiry)
         self.businessHandlingButton.clicked.connect(self.switch_to_business_handling)
 
-        # 连接充值界面按钮
+        # 充值界面按钮
         self.confirmRechargeButton.clicked.connect(self.confirm_recharge)
         self.backToUserButton_recharge.clicked.connect(self.back_to_user)
 
-        # 连接账单查询界面按钮
+        # 账单查询界面按钮
         self.backToUserButton_billInquiry.clicked.connect(self.back_to_user)
 
-        # 连接业务办理界面按钮
+        # 业务办理界面按钮
         self.handleBusinessButton.clicked.connect(self.handle_business)
         self.backToUserButton_businessHandling.clicked.connect(self.back_to_user)
 
-        # 初始化TelechargeSystem实例
-        self.system = TelechargeSystem()
+        # 获取业务办理界面的布局
+        self.servicesLayout = self.findChild(QtWidgets.QVBoxLayout, 'servicesLayout')
+        self.packagesLayout = self.findChild(QtWidgets.QVBoxLayout, 'packagesLayout')
 
-        # 加载套餐数据
+        # 加载注册界面的套餐数据
         self.load_packages()
 
     def load_packages(self):
@@ -64,8 +69,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.taocancombox.clear()
             for package in packages:
                 self.taocancombox.addItem(package['PackageName'], package['PackageID'])
-        except pymysql.MySQLError as e:
-            QtWidgets.QMessageBox.critical(self, "数据库错误", f"无法加载套餐数据: {str(e)}")
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "错误", f"加载套餐数据失败：{str(e)}")
+
 
     def login(self):
         phone = self.loginTeleNumberEdit.text().strip()
@@ -160,7 +166,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 package_id=package_id
             )
             QtWidgets.QMessageBox.information(self, "注册成功", "账户注册成功！请登录。")
-            self.backtoLogin()
+            self.backtologin()
         except PhoneNumberNotFoundError as e:
             QtWidgets.QMessageBox.warning(self, "注册失败", str(e))
         except DatabaseError as e:
@@ -170,7 +176,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "错误", str(e))
 
-    def backtoLogin(self):
+    def backtologin(self):
         self.tabWidget.setCurrentWidget(self.findChild(QtWidgets.QWidget, 'tab_login'))
 
     # 我的套餐
@@ -191,8 +197,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def show_balance(self):
         phone = self.loginTeleNumberEdit.text().strip()
         try:
-            balance_info = self.system.get_balance_info(phone)
-            info = f"当前话费余额: {balance_info['current_balance']}元\n本月已消费话费量: {balance_info['consumed_balance']}元"
+            balance_info = self.system.get_package_details(phone)
+            # info = f"话费余额: {balance_info['AccountBalance']}元\n本月消费: {balance_info['consumed_balance']}元"
+            info = f"话费余额: {balance_info['AccountBalance']}元\n"
             QtWidgets.QMessageBox.information(self, "话费余额", info)
         except PhoneNumberNotFoundError as e:
             QtWidgets.QMessageBox.warning(self, "错误", str(e))
@@ -205,8 +212,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def show_call_balance(self):
         phone = self.loginTeleNumberEdit.text().strip()
         try:
-            call_balance_info = self.system.get_call_balance_info(phone)
-            info = f"本月剩余语音配额: {call_balance_info['remaining_voice_quota']}分钟\n本月通话时长: {call_balance_info['call_duration']}分钟"
+            call_balance_info = self.system.get_package_details(phone)
+             # info = f"本月剩余语音配额: {call_balance_info['VoiceBalance']}分钟\n本月通话时长: {call_balance_info['call_duration']}分钟"
+            info = f"本月剩余语音配额: {call_balance_info['VoiceBalance']}分钟\n"
             QtWidgets.QMessageBox.information(self, "通话余额", info)
         except PhoneNumberNotFoundError as e:
             QtWidgets.QMessageBox.warning(self, "错误", str(e))
@@ -242,13 +250,32 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             services = self.system.get_available_services()
             packages = self.system.get_available_packages()
-            services_text = "\n".join([f"服务ID: {s['ServiceID']}, 名称: {s['ServiceName']}" for s in services])
-            packages_text = "\n".join([f"套餐ID: {p['PackageID']}, 名称: {p['PackageName']}" for p in packages])
-            self.availableServicesTextEdit.setPlainText(services_text)
-            self.availablePackagesTextEdit.setPlainText(packages_text)
-            self.tabWidget.setCurrentWidget(self.findChild(QtWidgets.QWidget, 'tab_businessHandling'))
-        except DatabaseError as e:
-            QtWidgets.QMessageBox.critical(self, "数据库错误", str(e))
+            
+            # 清空已有的布局和控件
+            while self.servicesLayout.count():
+                item = self.servicesLayout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+            while self.packagesLayout.count():
+                item = self.packagesLayout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+            
+            # 添加服务信息
+            for service in services:
+                info = f"业务ID: {service['ServiceID']}, 名称: {service['Name']}, 价格: {service['Price']}元, 额度: {service['Quota']}"
+                label = QtWidgets.QLabel(info)
+                self.servicesLayout.addWidget(label)
+            
+            # 添加套餐信息
+            for package in packages:
+                info = f"套餐ID: {package['PackageID']}, 名称: {package['PackageName']}, 价格: {package['Price']}元, 语音配额: {package['VoiceQuota']}分钟"
+                label = QtWidgets.QLabel(info)
+                self.packagesLayout.addWidget(label)
+            
+            self.tabWidget.setCurrentWidget(self.tab_businessHandling)
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "错误", str(e))
 
@@ -287,67 +314,69 @@ class MainWindow(QtWidgets.QMainWindow):
     def handle_business(self):
         dialog = QtWidgets.QDialog(self)
         dialog.setWindowTitle("办理业务或套餐")
-        layout = QtWidgets.QVBoxLayout()
-
+        layout = QtWidgets.QVBoxLayout(dialog)
+    
         type_label = QtWidgets.QLabel("请选择办理类型:")
         layout.addWidget(type_label)
-
+    
         type_combo = QtWidgets.QComboBox()
         type_combo.addItems(["业务", "套餐"])
         layout.addWidget(type_combo)
-
+    
         name_label = QtWidgets.QLabel("请选择项目名称:")
         layout.addWidget(name_label)
-
+    
         name_combo = QtWidgets.QComboBox()
         layout.addWidget(name_combo)
-
-        # 动态加载项目名称
-        def load_names():
+    
+        def load_items():
             selected_type = type_combo.currentText()
             name_combo.clear()
             if selected_type == "业务":
                 services = self.system.get_available_services()
-                name_combo.addItems([s['ServiceName'] for s in services])
+                for s in services:
+                    name_combo.addItem(f"{s['Name']} (价格：{s['Price']}元)", s['ServiceID'])
             elif selected_type == "套餐":
                 packages = self.system.get_available_packages()
-                name_combo.addItems([p['PackageName'] for p in packages])
-
-        type_combo.currentIndexChanged.connect(load_names)
-        load_names()
-
-        confirm_button = QtWidgets.QPushButton("确认办理")
-        layout.addWidget(confirm_button)
-
-        # 确认按钮事件
+                for p in packages:
+                    name_combo.addItem(f"{p['PackageName']} (价格：{p['Price']}元)", p['PackageID'])
+    
+        type_combo.currentIndexChanged.connect(load_items)
+        load_items()
+    
+        handle_button = QtWidgets.QPushButton("办理")
+        layout.addWidget(handle_button)
+    
         def confirm_handle():
             selected_type = type_combo.currentText()
-            selected_name = name_combo.currentText()
+            selected_id = name_combo.currentData()
+            if not selected_id:
+                QtWidgets.QMessageBox.warning(dialog, "办理失败", "请选择项目")
+                return
             confirmation = QtWidgets.QMessageBox.question(
-                dialog, "确认办理", f"确定要办理{selected_type}：{selected_name}吗？",
+                dialog, "确认办理", f"确定要办理 {selected_type}：{name_combo.currentText()} 吗？",
                 QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
             )
             if confirmation == QtWidgets.QMessageBox.StandardButton.Yes:
                 try:
                     if selected_type == "业务":
-                        self.system.handle_service(self.loginTeleNumberEdit.text().strip(), selected_name)
+                        self.system.subscribe_service(self.current_user_phone, selected_id)
                     elif selected_type == "套餐":
-                        self.system.change_phone_package(self.loginTeleNumberEdit.text().strip(), selected_name)
-                    QtWidgets.QMessageBox.information(dialog, "办理成功", f"{selected_type}办理成功！")
+                        self.system.change_phone_package(self.current_user_phone, selected_id)
+                    QtWidgets.QMessageBox.information(dialog, "办理成功", f"{selected_type}办理成功")
                     dialog.accept()
-                except DatabaseError as e:
-                    QtWidgets.QMessageBox.critical(dialog, "数据库错误", str(e))
+                    # 办理成功后，更新显示的业务和套餐信息
+                    self.switch_to_business_handling()
                 except Exception as e:
-                    QtWidgets.QMessageBox.critical(dialog, "错误", str(e))
-
-        confirm_button.clicked.connect(confirm_handle)
-
-        dialog.setLayout(layout)
+                    QtWidgets.QMessageBox.critical(dialog, "办理失败", str(e))
+    
+        handle_button.clicked.connect(confirm_handle)
+    
         dialog.exec()
 
     # 返回用户界面
     def back_to_user(self):
-        self.tabWidget.setCurrentWidget(self.findChild(QtWidgets.QWidget, 'tab_user'))
+        self.tabWidget.setCurrentWidget(self.tab_user)
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
