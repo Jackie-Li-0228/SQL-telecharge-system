@@ -54,7 +54,7 @@
        </string>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_login">
        <property name="styleSheet">
@@ -1062,7 +1062,7 @@ padding: 5px;</string>
        <widget class="QPushButton" name="backToUserButton_billInquiry">
         <property name="geometry">
          <rect>
-          <x>340</x>
+          <x>350</x>
           <y>310</y>
           <width>121</width>
           <height>23</height>
@@ -1089,11 +1089,14 @@ color: rgb(0, 0, 0)</string>
          <item>
           <widget class="QTableWidget" name="billTableWidget">
            <property name="styleSheet">
-            <string notr="true">border: 2px solid #000000;
-border-radius: 10px;
-background-color: #FFFFFF;
-color: #000000;
-padding: 5px;</string>
+            <string notr="true">QTableWidget {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 5px;
+}
+</string>
            </property>
           </widget>
          </item>
@@ -1124,8 +1127,8 @@ color: rgb(0, 0, 0)</string>
        <widget class="QPushButton" name="handleBusinessButton">
         <property name="geometry">
          <rect>
-          <x>210</x>
-          <y>280</y>
+          <x>190</x>
+          <y>290</y>
           <width>91</width>
           <height>31</height>
          </rect>
@@ -1144,44 +1147,54 @@ padding: 5px;</string>
        <widget class="QWidget" name="verticalLayoutWidget">
         <property name="geometry">
          <rect>
-          <x>119</x>
+          <x>39</x>
           <y>19</y>
-          <width>271</width>
-          <height>101</height>
+          <width>411</width>
+          <height>121</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="servicesTableLayout">
          <item>
-          <widget class="QTableWidget" name="servicesTableWidget">
-           <property name="styleSheet">
-            <string notr="true">border: 2px solid #000000;
-border-radius: 10px;
-background-color: #FFFFFF;
-color: #000000;
-padding: 5px;</string>
-           </property>
-          </widget>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QTableWidget" name="servicesTableWidget">
+             <property name="styleSheet">
+              <string notr="true">QTableWidget {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 5px;
+}
+</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
        <widget class="QWidget" name="verticalLayoutWidget_2">
         <property name="geometry">
          <rect>
-          <x>119</x>
+          <x>39</x>
           <y>149</y>
-          <width>271</width>
-          <height>91</height>
+          <width>411</width>
+          <height>131</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="packagesTableLayout">
          <item>
           <widget class="QTableWidget" name="packagesTableWidget">
            <property name="styleSheet">
-            <string notr="true">border: 2px solid #000000;
-border-radius: 10px;
-background-color: #FFFFFF;
-color: #000000;
-padding: 5px;</string>
+            <string notr="true">QTableWidget {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 5px;
+}
+</string>
            </property>
           </widget>
          </item>
