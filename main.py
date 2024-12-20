@@ -8,7 +8,7 @@ from src import TelechargeSystem
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
-        super().__init__()  
+        super().__init__()
 
         # 构建UI文件的绝对路径
         ui_path = os.path.join(os.path.dirname(__file__), 'src', 'telecharge.ui')
@@ -40,7 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.registerButton.clicked.connect(self.register)
         self.backtologinButton.clicked.connect(self.backtologin)
 
-        # 用户界面按钮
+        # 用户界面组件
         self.myPackageButton.clicked.connect(self.show_my_package)
         self.balanceButton.clicked.connect(self.show_balance)
         self.callBalanceButton.clicked.connect(self.show_call_balance)
@@ -48,7 +48,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.billInquiryButton.clicked.connect(self.switch_to_bill_inquiry)
         self.businessHandlingButton.clicked.connect(self.switch_to_business_handling)
         
-        # 用户界面新增组件
         self.accountStatusLabel = self.findChild(QtWidgets.QLabel, 'accountStatusLabel_user')
         if self.accountStatusLabel:
             self.accountStatusLabel.setText("状态: ")
@@ -60,6 +59,19 @@ class MainWindow(QtWidgets.QMainWindow):
             self.logoutButton_user.clicked.connect(self.logout)
         else:
             QtWidgets.QMessageBox.critical(self, "错误", "找不到logoutButton_user控件")
+            
+        # 客服界面组件
+        self.customerServicePhoneEdit = self.findChild(QtWidgets.QLineEdit, 'customerServicePhoneEdit')
+        self.customerServiceButton = self.findChild(QtWidgets.QPushButton, 'customerServiceButton')
+        self.customerServiceInfoWidget = self.findChild(QtWidgets.QWidget, 'customerServiceInfoWidget')
+        self.customerServiceTransactionsWidget = self.findChild(QtWidgets.QWidget, 'customerServiceTransactionsWidget')
+        self.allPackagesWidget = self.findChild(QtWidgets.QWidget, 'allPackagesWidget')
+        self.allServicesWidget = self.findChild(QtWidgets.QWidget, 'allServicesWidget')
+
+        if self.customerServiceButton:
+            self.customerServiceButton.clicked.connect(self.fetch_customer_service_info)
+        else:
+            QtWidgets.QMessageBox.critical(self, "错误", "找不到customerServiceButton控件")
 
 
         # 充值界面按钮
@@ -439,7 +451,7 @@ class MainWindow(QtWidgets.QMainWindow):
             details = (
                 f"套餐ID: {package['PackageID']}\n"
                 f"套餐名称: {package['PackageName']}\n"
-                f"价格: {package['Price']}元\n"
+                f"价格: {package['PackagePrice']}元\n"
                 f"合约期: {package['ContractDuration']}个月\n"
                 f"语音额度: {package['VoiceQuota']}分钟\n"
                 f"超套标准: {package['OverQuotaStandard']}元/分钟"
@@ -520,6 +532,136 @@ class MainWindow(QtWidgets.QMainWindow):
             self.accountStatusLabel.setText("状态: ")
             self.accountStatusLabel.setStyleSheet("color: black;")
         self.tabWidget.setCurrentIndex(0)
+    
+    # 客服界面功能
+    def fetch_customer_service_info(self):
+        phone = self.customerServicePhoneEdit.text().strip()
+        if not phone:
+            QtWidgets.QMessageBox.warning(self, "输入错误", "请输入电话号码。")
+            return
+        try:
+            user_info = self.system.get_user_info_by_phone(phone)
+            transaction_records = self.system.get_transaction_records_by_phone(phone)
+            packages = self.system.get_available_packages()
+            services = self.system.get_available_services()
+
+            # 展示用户信息
+            self.display_user_info(user_info)
+
+            # 展示交易记录
+            self.display_transaction_records(transaction_records)
+
+            # 展示所有套餐
+            self.display_all_packages(packages)
+
+            # 展示所有业务
+            self.display_all_services(services)
+
+            QtWidgets.QMessageBox.information(self, "信息获取成功", "已成功获取并展示相关信息。")
+        except PhoneNumberNotFoundError as e:
+            QtWidgets.QMessageBox.warning(self, "错误", str(e))
+        except DatabaseError as e:
+            QtWidgets.QMessageBox.critical(self, "数据库错误", str(e))
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "错误", str(e))
+
+    def display_user_info(self, user_info):
+        layout = self.customerServiceInfoWidget.layout()
+        if not layout:
+            layout = QtWidgets.QVBoxLayout()
+            self.customerServiceInfoWidget.setLayout(layout)
+        else:
+            while layout.count():
+                child = layout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()
+
+        for key, value in user_info.items():
+            label = QtWidgets.QLabel(f"{key}: {value}")
+            layout.addWidget(label)
+
+    def display_transaction_records(self, transaction_records):
+        layout = self.customerServiceTransactionsWidget.layout()
+        if not layout:
+            layout = QtWidgets.QVBoxLayout()
+            self.customerServiceTransactionsWidget.setLayout(layout)
+        else:
+            while layout.count():
+                child = layout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()
+
+        table = QtWidgets.QTableWidget()
+        headers = ['TransactionID', 'Time', 'Item', 'Amount']
+        table.setColumnCount(len(headers))
+        table.setHorizontalHeaderLabels(headers)
+        table.setRowCount(len(transaction_records))
+        for row, record in enumerate(transaction_records):
+            table.setItem(row, 0, QtWidgets.QTableWidgetItem(str(record['TransactionID'])))
+            table.setItem(row, 1, QtWidgets.QTableWidgetItem(str(record['TransactionTime'])))
+            table.setItem(row, 2, QtWidgets.QTableWidgetItem(record['PurchasedItem']))
+            table.setItem(row, 3, QtWidgets.QTableWidgetItem(f"{record['Amount']}元"))
+        table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        table.horizontalHeader().setStretchLastSection(True)
+        table.resizeColumnsToContents()
+        layout.addWidget(table)
+
+    def display_all_packages(self, packages):
+        layout = self.allPackagesWidget.layout()
+        if not layout:
+            layout = QtWidgets.QVBoxLayout()
+            self.allPackagesWidget.setLayout(layout)
+        else:
+            while layout.count():
+                child = layout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()
+
+        table = QtWidgets.QTableWidget()
+        headers = ['PackageID', 'PackageName', 'PackagePrice', 'LaunchTime', 'ExpirationTime', 'ContractDuration',     'VoiceQuota', 'OverQuotaStandard']
+        table.setColumnCount(len(headers))
+        table.setHorizontalHeaderLabels(headers)
+        table.setRowCount(len(packages))
+        for row, package in enumerate(packages):
+            table.setItem(row, 0, QtWidgets.QTableWidgetItem(package['PackageID']))
+            table.setItem(row, 1, QtWidgets.QTableWidgetItem(package['PackageName']))
+            table.setItem(row, 2, QtWidgets.QTableWidgetItem(f"{package['PackagePrice']}元"))
+            table.setItem(row, 3, QtWidgets.QTableWidgetItem(str(package['LaunchTime'])))
+            table.setItem(row, 4, QtWidgets.QTableWidgetItem(str(package['ExpirationTime'])))
+            table.setItem(row, 5, QtWidgets.QTableWidgetItem(f"{package['ContractDuration']}个月"))
+            table.setItem(row, 6, QtWidgets.QTableWidgetItem(f"{package['VoiceQuota']}分钟"))
+            table.setItem(row, 7, QtWidgets.QTableWidgetItem(f"{package['OverQuotaStandard']}元/分钟"))
+        table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        table.horizontalHeader().setStretchLastSection(True)
+        table.resizeColumnsToContents()
+        layout.addWidget(table)
+
+    def display_all_services(self, services):
+        layout = self.allServicesWidget.layout()
+        if not layout:
+            layout = QtWidgets.QVBoxLayout()
+            self.allServicesWidget.setLayout(layout)
+        else:
+            while layout.count():
+                child = layout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()
+
+        table = QtWidgets.QTableWidget()
+        headers = ['ServiceID', 'ServiceName', 'Price', 'Quota', 'ActivationMethodID']
+        table.setColumnCount(len(headers))
+        table.setHorizontalHeaderLabels(headers)
+        table.setRowCount(len(services))
+        for row, service in enumerate(services):
+            table.setItem(row, 0, QtWidgets.QTableWidgetItem(service['ServiceID']))
+            table.setItem(row, 1, QtWidgets.QTableWidgetItem(service['ServiceName']))
+            table.setItem(row, 2, QtWidgets.QTableWidgetItem(f"{service['Price']}元"))
+            table.setItem(row, 3, QtWidgets.QTableWidgetItem(f"{service['Quota']}"))
+            table.setItem(row, 4, QtWidgets.QTableWidgetItem(str(service['ActivationMethodID'])))
+        table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+        table.horizontalHeader().setStretchLastSection(True)
+        table.resizeColumnsToContents()
+        layout.addWidget(table)
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

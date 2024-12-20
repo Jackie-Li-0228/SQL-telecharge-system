@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>488</width>
+    <width>639</width>
     <height>420</height>
    </rect>
   </property>
@@ -54,7 +54,7 @@
        </string>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab_login">
        <property name="styleSheet">
@@ -914,6 +914,132 @@ padding: 5px;</string>
        <attribute name="title">
         <string>Server</string>
        </attribute>
+       <widget class="QLineEdit" name="customerServicePhoneEdit">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>10</y>
+          <width>181</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border: 2px solid #000000;
+border-radius: 10px;
+background-color: #FFFFFF;
+color: #000000;
+padding: 5px;</string>
+        </property>
+        <property name="placeholderText">
+         <string>输入查询手机号</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="customerServiceButton">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>10</y>
+          <width>51</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+        </property>
+        <property name="text">
+         <string>查找</string>
+        </property>
+       </widget>
+       <widget class="QTableWidget" name="customerServiceInfoWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>50</y>
+          <width>271</width>
+          <height>131</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QTableWidget {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 5px;
+}
+</string>
+        </property>
+       </widget>
+       <widget class="QTableWidget" name="customerServiceTransactionsWidget">
+        <property name="geometry">
+         <rect>
+          <x>330</x>
+          <y>50</y>
+          <width>291</width>
+          <height>131</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QTableWidget {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 5px;
+}
+</string>
+        </property>
+       </widget>
+       <widget class="QTableWidget" name="allServicesWidget">
+        <property name="geometry">
+         <rect>
+          <x>330</x>
+          <y>190</y>
+          <width>291</width>
+          <height>141</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QTableWidget {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 5px;
+}
+</string>
+        </property>
+       </widget>
+       <widget class="QTableWidget" name="allPackagesWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>190</y>
+          <width>271</width>
+          <height>141</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QTableWidget {
+    border: 2px solid #000000;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #000000;
+    padding: 5px;
+}
+</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_admin">
        <attribute name="title">
@@ -1244,7 +1370,7 @@ padding: 5px;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>488</width>
+     <width>639</width>
      <height>22</height>
     </rect>
    </property>
