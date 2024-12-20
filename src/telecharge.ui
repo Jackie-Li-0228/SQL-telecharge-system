@@ -1039,22 +1039,20 @@ color: rgb(0, 0, 0)</string>
          <string>Back</string>
         </property>
        </widget>
-       <widget class="QTextEdit" name="billTextEdit">
+       <widget class="QWidget" name="verticalLayoutWidget_3">
         <property name="geometry">
          <rect>
-          <x>180</x>
-          <y>60</y>
-          <width>104</width>
-          <height>64</height>
+          <x>59</x>
+          <y>19</y>
+          <width>351</width>
+          <height>141</height>
          </rect>
         </property>
-        <property name="styleSheet">
-         <string notr="true">border: 2px solid #000000;
-border-radius: 10px;
-background-color: #FFFFFF;
-color: #000000;
-padding: 5px;</string>
-        </property>
+        <layout class="QVBoxLayout" name="billTableLayout">
+         <item>
+          <widget class="QTableWidget" name="billTableWidget"/>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_businessHandling">
@@ -1107,7 +1105,11 @@ padding: 5px;</string>
           <height>80</height>
          </rect>
         </property>
-        <layout class="QVBoxLayout" name="servicesLayout"/>
+        <layout class="QVBoxLayout" name="servicesTableLayout">
+         <item>
+          <widget class="QTableWidget" name="servicesTableWidget"/>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="verticalLayoutWidget_2">
         <property name="geometry">
@@ -1118,7 +1120,11 @@ padding: 5px;</string>
           <height>80</height>
          </rect>
         </property>
-        <layout class="QVBoxLayout" name="packagesLayout"/>
+        <layout class="QVBoxLayout" name="packagesTableLayout">
+         <item>
+          <widget class="QTableWidget" name="packagesTableWidget"/>
+         </item>
+        </layout>
        </widget>
       </widget>
      </widget>
