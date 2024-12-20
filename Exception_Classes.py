@@ -79,3 +79,7 @@ class ObjectNotFoundError(Exception):
     def __init__(self, message="Object not found."):
         self.message = message
         super().__init__(self.message)
+
+class InputCheckFailed(Exception):
+    def __init__(self, message):
+        super().__init__(message)
