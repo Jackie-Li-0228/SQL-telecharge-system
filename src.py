@@ -1135,7 +1135,7 @@ class TelechargeSystem:
     def subscribe_service(self, phone_number, service_id):
         # 查询业务信息
         self.cursor.execute("""
-            SELECT ServiceID, Price, ActivationMethodID FROM Services WHERE ServiceID = %s
+            SELECT ServiceID, Price, Quota,ActivationMethodID FROM Services WHERE ServiceID = %s
         """, (service_id,))
         service = self.cursor.fetchone()
         
@@ -1143,7 +1143,7 @@ class TelechargeSystem:
         if service is None:
             raise NoValidServiceFoundError(f"Service with ServiceID {service_id} not found.")
         
-        service_id, price, activation_method_id = service
+        service_id, price,quota, activation_method_id = service
         
         # 获取当前时间
         current_time = datetime.now()
@@ -1161,6 +1161,12 @@ class TelechargeSystem:
                 INSERT INTO TransactionRecords (TransactionTime, PurchasedItem, Amount, PhoneNumber)
                 VALUES (%s, %s, %s, %s)
             """, (current_time, service_id, price, phone_number))
+
+            self.cursor.execute("""
+                UPDATE PhoneAccounts 
+                SET VoiceBalance = VoiceBalance + %s
+                WHERE PhoneNumber = %s
+            """, (quota, phone_number,))
             
             # 提交事务
             self.db.commit()
