@@ -1014,6 +1014,15 @@ class TelechargeSystem:
     #     print(f"An error occurred: {e}")
 
     def get_available_services(self):
+        """
+        Function to get all available services.
+
+        Returns:
+        - A list of dictionaries, each containing details of an available service.
+
+        Raises:
+        - DatabaseError: If there is any database-related error during the query.
+        """
         try:
             # 查询所有业务数据
             self.cursor.execute("""
@@ -1027,18 +1036,26 @@ class TelechargeSystem:
                 print("No services available.")
                 return []
 
-            # 输出所有可订阅的业务信息
-            print("Available Services:")
+            # 将查询到的服务信息组织为字典并返回
+            service_list = []
             for service in services:
-                service_id, name, price, quota, activation_method_id = service
-                activation_method = "Immediate" if activation_method_id == 1 else "Next Month"
-                print(f"ServiceID: {service_id}, Name: {name}, Price: {price}, Quota: {quota}, Activation Method: {activation_method}")
-            
-            return services
+                service_data = {
+                    "ServiceID": service[0],
+                    "ServiceName": service[1],
+                    "Price": service[2],
+                    "Quota": service[3],
+                    "ActivationMethodID": service[4],
+                    "ActivationMethod": "Immediate" if service[4] == 1 else "Next Month"
+                }
+                service_list.append(service_data)
+
+            print(f"Available services: {service_list}")
+            return service_list
 
         except mysql.connector.Error as err:
-            print(f"Error: {err}")
-            return []
+            # 捕获数据库错误并抛出异常
+            raise DatabaseError(f"Error while fetching available services: {err}")
+
 
     # 示例：查看所有可用的业务
     # get_available_services()
