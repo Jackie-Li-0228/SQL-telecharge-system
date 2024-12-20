@@ -292,10 +292,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 select_item.setCheckState(QtCore.Qt.CheckState.Unchecked)
                 self.servicesTableWidget.setItem(row, 0, select_item)
                 self.servicesTableWidget.setItem(row, 1, QtWidgets.QTableWidgetItem(str(service['ServiceID'])))
-                self.servicesTableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(service['Name']))
+                self.servicesTableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(service['ServiceName']))
                 self.servicesTableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(f"{service['Price']}元"))
                 self.servicesTableWidget.setItem(row, 4, QtWidgets.QTableWidgetItem(f"{service['Quota']}"))
-                self.servicesTableWidget.setItem(row, 5, QtWidgets.QTableWidgetItem(service.get('ActivationMethodName', '未知')))
+                self.servicesTableWidget.setItem(row, 5, QtWidgets.QTableWidgetItem(service.get('ActivationMethod', '未知')))
             self.servicesTableWidget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
             self.servicesTableWidget.horizontalHeader().setStretchLastSection(True)
             self.servicesTableWidget.resizeColumnsToContents()
@@ -323,7 +323,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.packagesTableWidget.setItem(row, 0, select_item)
                 self.packagesTableWidget.setItem(row, 1, QtWidgets.QTableWidgetItem(str(package['PackageID'])))
                 self.packagesTableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(package['PackageName']))
-                self.packagesTableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(f"{package['Price']}元"))
+                self.packagesTableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(f"{package['PackagePrice']}元"))
                 self.packagesTableWidget.setItem(row, 4, QtWidgets.QTableWidgetItem(f"{package['ContractDuration']}个月"))
                 self.packagesTableWidget.setItem(row, 5, QtWidgets.QTableWidgetItem(f"{package['VoiceQuota']}分钟"))
                 self.packagesTableWidget.setItem(row, 6, QtWidgets.QTableWidgetItem(f"{package['OverQuotaStandard']}元/分钟"))
@@ -351,8 +351,11 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, "输入错误", "请输入有效的金额。")
             return
 
-        if amount <= 0 or amount > 1000:
-            QtWidgets.QMessageBox.warning(self, "输入错误", "充值金额必须大于0且小于等于1000。")
+        try:
+            if amount <= 0 or amount > 1000:
+                QtWidgets.QMessageBox.warning(self, "输入错误", "充值金额必须大于0且小于等于1000。")
+        except InvalidOperation:
+            QtWidgets.QMessageBox.warning(self, "数值异常", "请输入有效的金额。")
             return
 
         # 检查小数位数
