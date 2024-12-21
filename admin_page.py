@@ -126,9 +126,9 @@ class AdminInterface:
             self.adminAllPackagesWidget.setLayout(layout)
         else:
             while layout.count():
-                child = layout.takeAt(0)
-                if child.widget():
-                    child.widget().deleteLater()
+                item = layout.takeAt(0)
+                if item.widget():
+                    item.widget().deleteLater()
 
         packages = self.system.get_available_packages()
         self.packagesTableWidget = QtWidgets.QTableWidget()
@@ -138,20 +138,20 @@ class AdminInterface:
         self.packagesTableWidget.setHorizontalHeaderLabels(headers)
         self.packagesTableWidget.setRowCount(len(packages))
         for row, package in enumerate(packages):
-            # 添加复选框
-            select_item = QtWidgets.QTableWidgetItem()
-            select_item.setFlags(QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            select_item.setCheckState(QtCore.Qt.CheckState.Unchecked)
-            self.packagesTableWidget.setItem(row, 0, select_item)
+            # 第一列勾选框
+            check_item = QtWidgets.QTableWidgetItem()
+            check_item.setFlags(check_item.flags() | QtCore.Qt.ItemFlag.ItemIsUserCheckable)
+            check_item.setCheckState(QtCore.Qt.CheckState.Unchecked)
+            self.packagesTableWidget.setItem(row, 0, check_item)
 
             self.packagesTableWidget.setItem(row, 1, QtWidgets.QTableWidgetItem(str(package['PackageID'])))
-            self.packagesTableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(package['PackageName']))
-            self.packagesTableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(f"{package['PackagePrice']}元"))
+            self.packagesTableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(str(package['PackageName'])))
+            self.packagesTableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(str(package['PackagePrice'])))
             self.packagesTableWidget.setItem(row, 4, QtWidgets.QTableWidgetItem(str(package['LaunchTime'])))
             self.packagesTableWidget.setItem(row, 5, QtWidgets.QTableWidgetItem(str(package['ExpirationTime'])))
-            self.packagesTableWidget.setItem(row, 6, QtWidgets.QTableWidgetItem(f"{package['ContractDuration']}个月"))
-            self.packagesTableWidget.setItem(row, 7, QtWidgets.QTableWidgetItem(f"{package['VoiceQuota']}分钟"))
-            self.packagesTableWidget.setItem(row, 8, QtWidgets.QTableWidgetItem(f"{package['OverQuotaStandard']}元/分钟"))
+            self.packagesTableWidget.setItem(row, 6, QtWidgets.QTableWidgetItem(str(package['ContractDuration'])))
+            self.packagesTableWidget.setItem(row, 7, QtWidgets.QTableWidgetItem(str(package['VoiceQuota'])))
+            self.packagesTableWidget.setItem(row, 8, QtWidgets.QTableWidgetItem(str(package['OverQuotaStandard'])))
 
         self.packagesTableWidget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.packagesTableWidget.horizontalHeader().setStretchLastSection(True)
@@ -166,9 +166,9 @@ class AdminInterface:
             self.adminAllServicesWidget.setLayout(layout)
         else:
             while layout.count():
-                child = layout.takeAt(0)
-                if child.widget():
-                    child.widget().deleteLater()
+                item = layout.takeAt(0)
+                if item.widget():
+                    item.widget().deleteLater()
 
         services = self.system.get_available_services()
         self.servicesTableWidget = QtWidgets.QTableWidget()
@@ -177,15 +177,15 @@ class AdminInterface:
         self.servicesTableWidget.setHorizontalHeaderLabels(headers)
         self.servicesTableWidget.setRowCount(len(services))
         for row, service in enumerate(services):
-            # 添加复选框
-            select_item = QtWidgets.QTableWidgetItem()
-            select_item.setFlags(QtCore.Qt.ItemFlag.ItemIsUserCheckable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            select_item.setCheckState(QtCore.Qt.CheckState.Unchecked)
-            self.servicesTableWidget.setItem(row, 0, select_item)
+            # 第一列勾选框
+            check_item = QtWidgets.QTableWidgetItem()
+            check_item.setFlags(check_item.flags() | QtCore.Qt.ItemFlag.ItemIsUserCheckable)
+            check_item.setCheckState(QtCore.Qt.CheckState.Unchecked)
+            self.servicesTableWidget.setItem(row, 0, check_item)
 
             self.servicesTableWidget.setItem(row, 1, QtWidgets.QTableWidgetItem(str(service['ServiceID'])))
-            self.servicesTableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(service['ServiceName']))
-            self.servicesTableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(f"{service['Price']}元"))
+            self.servicesTableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(str(service['ServiceName'])))
+            self.servicesTableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(str(service['Price'])))
             self.servicesTableWidget.setItem(row, 4, QtWidgets.QTableWidgetItem(str(service['Quota'])))
             self.servicesTableWidget.setItem(row, 5, QtWidgets.QTableWidgetItem(str(service['ActivationMethodID'])))
 
@@ -196,38 +196,46 @@ class AdminInterface:
         layout.addWidget(self.servicesTableWidget)
 
     def package_item_changed(self, item):
-        if item.column() == 0:
+        if item.column() == 0:  # 只处理勾选列
+            row_count = self.packagesTableWidget.rowCount()
             if item.checkState() == QtCore.Qt.CheckState.Checked:
-                # 取消其他选择
-                for row in range(self.packagesTableWidget.rowCount()):
-                    if row != item.row():
-                        other_item = self.packagesTableWidget.item(row, 0)
-                        other_item.setCheckState(QtCore.Qt.CheckState.Unchecked)
-                for row in range(self.servicesTableWidget.rowCount()):
-                    service_item = self.servicesTableWidget.item(row, 0)
-                    service_item.setCheckState(QtCore.Qt.CheckState.Unchecked)
-                # 记录选择的套餐ID
-                self.selected_package_id = self.packagesTableWidget.item(item.row(), 1).text()
-                self.selected_service_id = None
+                # 先取消其他行的勾选
+                for r in range(row_count):
+                    if r != item.row():
+                        chk = self.packagesTableWidget.item(r, 0)
+                        if chk and chk.checkState() == QtCore.Qt.CheckState.Checked:
+                            chk.setCheckState(QtCore.Qt.CheckState.Unchecked)
+                # 记录当前选中的packageID
+                package_id_item = self.packagesTableWidget.item(item.row(), 1)
+                if package_id_item:
+                    self.selected_package_id = package_id_item.text()
             else:
-                self.selected_package_id = None
+                # 取消勾选时，如果就是当前行，则清空
+                if self.selected_package_id:
+                    package_id_item = self.packagesTableWidget.item(item.row(), 1)
+                    if package_id_item and package_id_item.text() == self.selected_package_id:
+                        self.selected_package_id = None
 
     def service_item_changed(self, item):
-        if item.column() == 0:
+        if item.column() == 0:  # 只处理勾选列
+            row_count = self.servicesTableWidget.rowCount()
             if item.checkState() == QtCore.Qt.CheckState.Checked:
-                # 取消其他选择
-                for row in range(self.servicesTableWidget.rowCount()):
-                    if row != item.row():
-                        other_item = self.servicesTableWidget.item(row, 0)
-                        other_item.setCheckState(QtCore.Qt.CheckState.Unchecked)
-                for row in range(self.packagesTableWidget.rowCount()):
-                    package_item = self.packagesTableWidget.item(row, 0)
-                    package_item.setCheckState(QtCore.Qt.CheckState.Unchecked)
-                # 记录选择的服务ID
-                self.selected_service_id = self.servicesTableWidget.item(item.row(), 1).text()
-                self.selected_package_id = None
+                # 先取消其他行的勾选
+                for r in range(row_count):
+                    if r != item.row():
+                        chk = self.servicesTableWidget.item(r, 0)
+                        if chk and chk.checkState() == QtCore.Qt.CheckState.Checked:
+                            chk.setCheckState(QtCore.Qt.CheckState.Unchecked)
+                # 记录当前选中的serviceID
+                service_id_item = self.servicesTableWidget.item(item.row(), 1)
+                if service_id_item:
+                    self.selected_service_id = service_id_item.text()
             else:
-                self.selected_service_id = None
+                # 取消勾选时，如果就是当前行，则清空
+                if self.selected_service_id:
+                    service_id_item = self.servicesTableWidget.item(item.row(), 1)
+                    if service_id_item and service_id_item.text() == self.selected_service_id:
+                        self.selected_service_id = None
 
     # 发布套餐
     def publish_package(self):
@@ -267,32 +275,21 @@ class AdminInterface:
             QtWidgets.QMessageBox.information(self.main_window, "发布成功", f"套餐[{package_id}]已发布。")
             self.display_all_packages()
         except Exception as e:
-            QtWidgets.QMessageBox.critical(self.main_window, "错误", f"发布失败: {str(e)}")
+            QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
 
     # 下架套餐
     def remove_package(self):
-        phone = self.main_window.current_user_phone
-        if not phone:
-            QtWidgets.QMessageBox.warning(self.main_window, "提示", "请先登录管理账号。")
-            return
-
-        package_id, ok = QtWidgets.QInputDialog.getText(self.main_window, "下架套餐", "请输入要下架的套餐ID:")
-        if not ok or not package_id:
-            return
-
-        confirmation = QtWidgets.QMessageBox.question(
-            self.main_window, "确认下架", f"确定要下架套餐[{package_id}]吗？",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
-        )
-        if confirmation != QtWidgets.QMessageBox.StandardButton.Yes:
-            return
-
         try:
-            self.system.remove_package_for_admin(phone, package_id)
-            QtWidgets.QMessageBox.information(self.main_window, "下架成功", f"套餐[{package_id}]已下架。")
+            if not self.selected_package_id:
+                QtWidgets.QMessageBox.warning(self.main_window, "提示", "请先勾选需要下架的套餐。")
+                return
+            phone = self.main_window.current_user_phone
+            self.system.remove_package_for_admin(phone, self.selected_package_id)
+            QtWidgets.QMessageBox.information(self.main_window, "下架成功", f"套餐[{self.selected_package_id}]已下架。")
+            self.selected_package_id = None
             self.display_all_packages()
         except Exception as e:
-            QtWidgets.QMessageBox.critical(self.main_window, "错误", f"下架失败: {str(e)}")
+            QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
 
     # 发布业务
     def publish_service(self):
@@ -321,38 +318,25 @@ class AdminInterface:
             price = float(price_str)
             quota = float(quota_str)
             activation_method_id = int(activation_str)
-            self.system.add_service_for_admin(
-                phone, service_id, service_name, price, quota, activation_method_id
-            )
+            self.system.add_service_for_admin(phone, service_id, service_name, price, quota, activation_method_id)
             QtWidgets.QMessageBox.information(self.main_window, "发布成功", f"业务[{service_id}]已发布。")
             self.display_all_services()
         except Exception as e:
-            QtWidgets.QMessageBox.critical(self.main_window, "错误", f"发布失败: {str(e)}")
+            QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
 
     # 下架业务
     def remove_service(self):
-        phone = self.main_window.current_user_phone
-        if not phone:
-            QtWidgets.QMessageBox.warning(self.main_window, "提示", "请先登录管理账号。")
-            return
-
-        service_id, ok = QtWidgets.QInputDialog.getText(self.main_window, "下架业务", "请输入要下架的业务ID:")
-        if not ok or not service_id:
-            return
-
-        confirmation = QtWidgets.QMessageBox.question(
-            self.main_window, "确认下架", f"确定要下架业务[{service_id}]吗？",
-            QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
-        )
-        if confirmation != QtWidgets.QMessageBox.StandardButton.Yes:
-            return
-
         try:
-            self.system.remove_service_for_admin(phone, service_id)
-            QtWidgets.QMessageBox.information(self.main_window, "下架成功", f"业务[{service_id}]已下架。")
+            if not self.selected_service_id:
+                QtWidgets.QMessageBox.warning(self.main_window, "提示", "请先勾选需要下架的业务。")
+                return
+            phone = self.main_window.current_user_phone
+            self.system.remove_service_for_admin(phone, self.selected_service_id)
+            QtWidgets.QMessageBox.information(self.main_window, "下架成功", f"业务[{self.selected_service_id}]已下架。")
+            self.selected_service_id = None
             self.display_all_services()
         except Exception as e:
-            QtWidgets.QMessageBox.critical(self.main_window, "错误", f"下架失败: {str(e)}")
+            QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
 
     def logout(self):
         self.main_window.current_user_phone = None
