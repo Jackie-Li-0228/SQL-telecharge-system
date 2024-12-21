@@ -49,7 +49,7 @@ class TelechargeSystem:
             if not isinstance(input_data, str):
                 raise InputCheckFailed(f"Expected a string but got {type(input_data).__name__}.")
             
-                    # 检查敏感符号
+            # 检查敏感符号
             if any(symbol in input_data for symbol in SENSITIVE_SYMBOLS):
                 raise InputCheckFailed(f"Input contains sensitive programming symbols: {', '.join(SENSITIVE_SYMBOLS)}.")
 
