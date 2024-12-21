@@ -8,12 +8,9 @@ class UserInterface:
         self.main_window = main_window
         self.system = TelechargeSystem()
         self.setup_ui()
-        
-    def back_to_user(self):
-        self.setup_ui()
-        self.main_window.tabWidget.setCurrentWidget(self.main_window.tab_user)
 
     def setup_ui(self):
+        # 仅连接一次信号
         self.main_window.myPackageButton.clicked.connect(self.show_my_package)
         self.main_window.balanceButton.clicked.connect(self.show_balance)
         self.main_window.callBalanceButton.clicked.connect(self.show_call_balance)
@@ -39,19 +36,26 @@ class UserInterface:
         self.main_window.handleBusinessButton.clicked.connect(self.handle_business)
         self.main_window.backToUserButton_businessHandling.clicked.connect(self.back_to_user)
 
+    def back_to_user(self):
+        self.main_window.tabWidget.setCurrentWidget(self.main_window.tab_user)
+    
     def show(self):
         self.main_window.tabWidget.setCurrentIndex(3)
+        self.refresh_user_page()
+
+    def refresh_user_page(self):
         if self.accountStatusLabel:
             phone = self.main_window.current_user_phone
-            result = self.system.get_user_info_by_phone(phone)
-            user_status = result.get('IsSuspended', '0')
-            if user_status == '1':
-                    QtWidgets.QMessageBox.warning(self.main_windows, "账号已停机。")
-                    if hasattr(self, 'accountStatusLabel'):
-                        self.accountStatusLabel.setText("状态: 停机")
-            else:
-                if hasattr(self, 'accountStatusLabel'):
-                    self.accountStatusLabel.setText("状态: 正常")        
+            try:
+                result = self.system.get_user_info_by_phone(phone)
+                user_status = result.get('IsSuspended', '0')
+                if user_status == '1':
+                    QtWidgets.QMessageBox.warning(self.main_window, "账号已停机。")
+                    self.accountStatusLabel.setText("状态: 停机")
+                else:
+                    self.accountStatusLabel.setText("状态: 正常")
+            except Exception as e:
+                QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))    
 
 
     def show_my_package(self):

@@ -41,7 +41,13 @@ class AdminInterface:
         self.display_all_services()
 
     def show(self):
-        self.main_window.tabWidget.setCurrentIndex(5)  
+        self.main_window.tabWidget.setCurrentIndex(5)
+        self.refresh_admin_page()
+
+    def refresh_admin_page(self):
+        # 重新加载相关数据
+        self.display_all_packages()
+        self.display_all_services()
 
     def fetch_admin_info(self):
         phone = self.adminPhoneEdit.text().strip()
@@ -291,7 +297,7 @@ class AdminInterface:
         if not phone:
             QtWidgets.QMessageBox.warning(self.main_window, "提示", "请先登录管理账号。")
             return
-    
+
         service_id, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布业务", "请输入业务ID:")
         if not ok or not service_id:
             return
@@ -307,7 +313,7 @@ class AdminInterface:
         activation_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布业务", "请输入生效方式ID(整数):")
         if not ok or not activation_str:
             return
-    
+
         try:
             price = float(price_str)
             quota = float(quota_str)

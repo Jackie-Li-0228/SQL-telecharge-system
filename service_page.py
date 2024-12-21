@@ -30,6 +30,12 @@ class CustomerServiceInterface:
         
     def show(self):
         self.main_window.tabWidget.setCurrentIndex(4)
+        self.refresh_service_page()
+
+    def refresh_service_page(self):
+        # 重新加载相关数据
+        self.display_all_packages()
+        self.display_all_services()
 
     def fetch_customer_service_info(self):
         phone = self.customerServicePhoneEdit.text().strip()
