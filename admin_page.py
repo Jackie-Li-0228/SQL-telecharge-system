@@ -22,7 +22,8 @@ class AdminInterface:
         self.publishServiceButton = self.main_window.findChild(QtWidgets.QPushButton, 'publishServiceButton')
         self.removePackageButton = self.main_window.findChild(QtWidgets.QPushButton, 'removePackageButton')
         self.removeServiceButton = self.main_window.findChild(QtWidgets.QPushButton, 'removeServiceButton')
-
+        self.main_window.logoutButton_admin.clicked.connect(self.logout)
+        
         if self.adminFetchButton:
             self.adminFetchButton.clicked.connect(self.fetch_admin_info)
         else:
@@ -69,24 +70,24 @@ class AdminInterface:
             self.adminInfoWidget.setLayout(layout)
         else:
             while layout.count():
-                item = layout.takeAt(0)
-                if item.widget():
-                    item.widget().deleteLater()
+                child = layout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()
 
         for key, value in user_info.items():
             label = QtWidgets.QLabel(f"{key}: {value}")
             layout.addWidget(label)
 
     def display_transaction_records(self, transaction_records):
-        layout = self.adminTransactionsWidget.layout()
+        layout = self.adminInfoWidget.layout()
         if not layout:
             layout = QtWidgets.QVBoxLayout()
-            self.adminTransactionsWidget.setLayout(layout)
+            self.adminInfoWidget.setLayout(layout)
         else:
             while layout.count():
-                item = layout.takeAt(0)
-                if item.widget():
-                    item.widget().deleteLater()
+                child = layout.takeAt(0)
+                if child.widget():
+                    child.widget().deleteLater()
 
         table = QtWidgets.QTableWidget()
         headers = ['TransactionID', 'Time', 'Item', 'Amount']
@@ -96,8 +97,8 @@ class AdminInterface:
         for row, record in enumerate(transaction_records):
             table.setItem(row, 0, QtWidgets.QTableWidgetItem(str(record['TransactionID'])))
             table.setItem(row, 1, QtWidgets.QTableWidgetItem(str(record['TransactionTime'])))
-            table.setItem(row, 2, QtWidgets.QTableWidgetItem(str(record['Item'])))
-            table.setItem(row, 3, QtWidgets.QTableWidgetItem(str(record['Amount'])))
+            table.setItem(row, 2, QtWidgets.QTableWidgetItem(record['PurchasedItem']))
+            table.setItem(row, 3, QtWidgets.QTableWidgetItem(f"{record['Amount']}元"))
 
         table.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         table.horizontalHeader().setStretchLastSection(True)
@@ -257,3 +258,9 @@ class AdminInterface:
             self.display_all_services()
         except Exception as e:
             QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
+
+    def logout(self):
+        self.main_window.current_user_phone = None
+        self.main_window.loginTeleNumberEdit.clear()
+        self.main_window.loginSecretEdit.clear()
+        self.main_window.tabWidget.setCurrentIndex(0)

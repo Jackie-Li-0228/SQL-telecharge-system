@@ -20,10 +20,16 @@ class UserInterface:
         self.main_window.billInquiryButton.clicked.connect(self.switch_to_bill_inquiry)
         self.main_window.businessHandlingButton.clicked.connect(self.switch_to_business_handling)
         self.main_window.logoutButton_user.clicked.connect(self.logout)
+        
+        # 账号停机判定
+        self.accountStatusLabel = self.main_window.findChild(QtWidgets.QLabel, 'accountStatusLabel_user')
 
-        # 充值界面按钮
+        # 充值界面元素
         self.main_window.confirmRechargeButton.clicked.connect(self.confirm_recharge)
         self.main_window.backToUserButton_recharge.clicked.connect(self.back_to_user)
+        self.rechargePhoneEdit=self.main_window.findChild(QtWidgets.QLineEdit, 'rechargePhoneEdit')
+        self.rechargeAmountEdit=self.main_window.findChild(QtWidgets.QLineEdit, 'rechargeAmountEdit')
+        self.rechargeMethodEdit=self.main_window.findChild(QtWidgets.QLineEdit, 'rechargeMethodEdit')
 
         # 账单查询界面按钮
         self.main_window.backToUserButton_billInquiry.clicked.connect(self.back_to_user)
@@ -34,6 +40,18 @@ class UserInterface:
 
     def show(self):
         self.main_window.tabWidget.setCurrentIndex(3)
+        if self.accountStatusLabel:
+            phone = self.main_window.current_user_phone
+            result = self.system.get_user_info_by_phone(phone)
+            user_status = result.get('IsSuspended', '0')
+            if user_status == '1':
+                    QtWidgets.QMessageBox.warning(self.main_windows, "账号已停机。")
+                    if hasattr(self, 'accountStatusLabel'):
+                        self.accountStatusLabel.setText("状态: 停机")
+            else:
+                if hasattr(self, 'accountStatusLabel'):
+                    self.accountStatusLabel.setText("状态: 正常")        
+
 
     def show_my_package(self):
         phone = self.main_window.current_user_phone
@@ -82,9 +100,9 @@ class UserInterface:
         
     # 充值
     def confirm_recharge(self):
-        phone = self.rechargePhoneEdit.text().strip()
-        amount_text = self.rechargeAmountEdit.text().strip()
-        payment_method = self.rechargeMethodEdit.text().strip()
+        phone = self.main_window.rechargePhoneEdit.text().strip()
+        amount_text = self.main_window.rechargeAmountEdit.text().strip()
+        payment_method = self.main_window.rechargeMethodEdit.text().strip()
         if not phone or not amount_text or not payment_method:
             QtWidgets.QMessageBox.warning(self.main_window, "输入错误", "请填写所有必填项。")
             return
@@ -109,7 +127,7 @@ class UserInterface:
             return
 
         confirmation = QtWidgets.QMessageBox.question(
-            self, "确认充值", f"确定要充值{amount}元到号码{phone}吗？",
+            self.main_window, "确认充值", f"确定要充值{amount}元到号码{phone}吗？",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No
         )
         if confirmation == QtWidgets.QMessageBox.StandardButton.Yes:

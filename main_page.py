@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 import pymysql
 from PyQt6 import QtWidgets, uic
 from Exception_Classes import *
@@ -37,20 +38,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.service_interface = CustomerServiceInterface(self)
         self.admin_interface = AdminInterface(self)
 
-        # 登录界面按钮
+        # 登录界面元素
         self.loginButton.clicked.connect(self.login)
         self.gotoregisterButton.clicked.connect(self.gotoregister)
         
-        # 注册界面按钮
+        # 注册界面元素
         self.registerButton.clicked.connect(self.register)
         self.backtologinButton.clicked.connect(self.backtologin)
-        
-        # 账号停机判定
-        self.accountStatusLabel = self.findChild(QtWidgets.QLabel, 'accountStatusLabel_user')
-        if self.accountStatusLabel:
-            self.accountStatusLabel.setText("状态: ")
-        else:
-            QtWidgets.QMessageBox.critical(self, "错误", "找不到accountStatusLabel_user控件")
+        self.load_packages()
 
     def login(self):
         phone = self.loginTeleNumberEdit.text().strip()
@@ -69,7 +64,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 cursorclass=pymysql.cursors.DictCursor
             )
             with connection.cursor() as cursor:
-                sql = "SELECT UserTypeID, Password, IsSuspended FROM PhoneAccounts WHERE PhoneNumber=%s"
+                sql = "SELECT UserTypeID, Password FROM PhoneAccounts WHERE PhoneNumber=%s"
                 cursor.execute(sql, (phone,))
                 result = cursor.fetchone()
 
@@ -79,33 +74,23 @@ class MainWindow(QtWidgets.QMainWindow):
                 if result['Password'] != password:
                     raise ValueError("密码错误。")
 
-                user_status = result.get('IsSuspended', '0')
-                if user_status == '1':
-                    QtWidgets.QMessageBox.warning(self, "账号已停机。")
-                    if hasattr(self, 'accountStatusLabel'):
-                        self.accountStatusLabel.setText("状态: 停机")
+
+                user_type_id = result['UserTypeID']
+                cursor.execute("SELECT UserTypeName FROM UserTypes WHERE UserTypeID=%s", (user_type_id,))
+                user_type_result = cursor.fetchone()
+                self.current_user_phone = phone
+
+                if not user_type_result:
+                    raise UserTypeNotFoundError("用户类型未找到。")
+                user_type = user_type_result['UserTypeName']
+                if user_type == '普通用户':
+                    self.user_interface.show()
+                elif user_type == '客服':
+                    self.service_interface.show()
+                elif user_type == '超级管理员':
+                    self.admin_interface.show()
                 else:
-                    if hasattr(self, 'accountStatusLabel'):
-                        self.accountStatusLabel.setText("状态: 正常")
-                    user_type_id = result['UserTypeID']
-                    cursor.execute("SELECT UserTypeName FROM UserTypes WHERE UserTypeID=%s", (user_type_id,))
-                    user_type_result = cursor.fetchone()
-
-                    if not user_type_result:
-                        raise UserTypeNotFoundError("用户类型未找到。")
-
-                    user_type = user_type_result['UserTypeName']
-
-                    if user_type == '普通用户':
-                        self.user_interface.show()
-                    elif user_type == '客服':
-                        self.service_interface.show()
-                    elif user_type == '超级管理员':
-                        self.admin_interface.show()
-                    else:
-                        raise ValueError("未知的用户类型。")
-
-                    self.current_user_phone = phone
+                    raise ValueError("未知的用户类型。")
 
         except UserNotFoundError as e:
             QtWidgets.QMessageBox.warning(self, "登录失败，用户不存在", str(e))
@@ -161,6 +146,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def backtologin(self):
         self.tabWidget.setCurrentWidget(self.findChild(QtWidgets.QWidget, 'tab_login'))
+    
+    def load_packages(self):
+        try:
+            packages = self.system.get_available_packages()
+            self.taocancombox.clear()
+            for package in packages:
+                self.taocancombox.addItem(package['PackageName'], package['PackageID'])
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "错误", f"加载套餐数据失败：{str(e)}")
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

@@ -15,6 +15,7 @@ class CustomerServiceInterface:
         self.customerServiceTransactionsWidget = self.main_window.findChild(QtWidgets.QWidget, 'customerServiceTransactionsWidget')
         self.allPackagesWidget = self.main_window.findChild(QtWidgets.QWidget, 'allPackagesWidget')
         self.allServicesWidget = self.main_window.findChild(QtWidgets.QWidget, 'allServicesWidget')
+        self.main_window.logoutButton_user.clicked.connect(self.logout)
         
         # 展示所有套餐
         self.display_all_packages()
@@ -150,3 +151,9 @@ class CustomerServiceInterface:
         table.horizontalHeader().setStretchLastSection(True)
         table.resizeColumnsToContents()
         layout.addWidget(table)
+
+    def logout(self):
+        self.main_window.current_user_phone = None
+        self.main_window.loginTeleNumberEdit.clear()
+        self.main_window.loginSecretEdit.clear()
+        self.main_window.tabWidget.setCurrentIndex(0)
