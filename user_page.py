@@ -104,7 +104,6 @@ class UserInterface:
         phone = self.main_window.rechargePhoneEdit.text().strip()
         self.system.check_input_format(phone, 'I')
         amount_text = self.main_window.rechargeAmountEdit.text().strip()
-        self.system.check_input_format(amount_text, 'I')
         payment_method = self.main_window.rechargeMethodEdit.text().strip()
         self.system.check_input_format(payment_method, 'S')
         if not phone or not amount_text or not payment_method:

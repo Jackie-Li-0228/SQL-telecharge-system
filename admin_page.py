@@ -233,7 +233,43 @@ class AdminInterface:
 
     # 发布套餐
     def publish_package(self):
-        pass
+        phone = self.main_window.current_user_phone
+        if not phone:
+            QtWidgets.QMessageBox.warning(self.main_window, "提示", "请先登录管理账号。")
+            return
+
+        package_id, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "请输入套餐ID:")
+        if not ok or not package_id:
+            return
+        package_name, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "请输入套餐名称:")
+        if not ok or not package_name:
+            return
+        price_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "请输入套餐价格(数字):")
+        if not ok or not price_str:
+            return
+        contract_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "请输入合约期(整数,单位月):")
+        if not ok or not contract_str:
+            return
+        voice_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "请输入语音额度(数字):")
+        if not ok or not voice_str:
+            return
+        over_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "请输入超额标准(数字/分钟):")
+        if not ok or not over_str:
+            return
+
+        try:
+            price = float(price_str)
+            contract_duration = int(contract_str)
+            voice_quota = float(voice_str)
+            over_quota_standard = float(over_str)
+            self.system.add_package_for_admin(
+                phone, package_id, package_name, price, 
+                contract_duration, voice_quota, over_quota_standard
+            )
+            QtWidgets.QMessageBox.information(self.main_window, "发布成功", f"套餐[{package_id}]已发布。")
+            self.display_all_packages()
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
 
     # 下架套餐
     def remove_package(self):
@@ -251,7 +287,36 @@ class AdminInterface:
 
     # 发布业务
     def publish_service(self):
-        pass
+        phone = self.main_window.current_user_phone
+        if not phone:
+            QtWidgets.QMessageBox.warning(self.main_window, "提示", "请先登录管理账号。")
+            return
+    
+        service_id, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布业务", "请输入业务ID:")
+        if not ok or not service_id:
+            return
+        service_name, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布业务", "请输入业务名称:")
+        if not ok or not service_name:
+            return
+        price_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布业务", "请输入业务价格(数字):")
+        if not ok or not price_str:
+            return
+        quota_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布业务", "请输入额度(数字):")
+        if not ok or not quota_str:
+            return
+        activation_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布业务", "请输入生效方式ID(整数):")
+        if not ok or not activation_str:
+            return
+    
+        try:
+            price = float(price_str)
+            quota = float(quota_str)
+            activation_method_id = int(activation_str)
+            self.system.add_service_for_admin(phone, service_id, service_name, price, quota, activation_method_id)
+            QtWidgets.QMessageBox.information(self.main_window, "发布成功", f"业务[{service_id}]已发布。")
+            self.display_all_services()
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
 
     # 下架业务
     def remove_service(self):
