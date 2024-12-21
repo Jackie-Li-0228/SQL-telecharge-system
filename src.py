@@ -1246,7 +1246,7 @@ class TelechargeSystem:
                 }
                 service_list.append(service_data)
 
-            print(f"Available services: {service_list}")
+            # print(f"Available services: {service_list}")
             return service_list
 
         except mysql.connector.Error as err:
