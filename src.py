@@ -9,6 +9,8 @@ SQL_KEYWORDS={
     'and','or','group','by','having','order','limit','like','union','into','values'
 }
 
+SENSITIVE_SYMBOLS = [';', ',', '.', '=', '(', ')', '{', '}', '[', ']', '<', '>', '"', "'"]
+
 class TelechargeSystem:
     def __init__(self,db=None,cursor=None):
         # 数据库连接设置
@@ -46,6 +48,11 @@ class TelechargeSystem:
             # 字符串检查
             if not isinstance(input_data, str):
                 raise InputCheckFailed(f"Expected a string but got {type(input_data).__name__}.")
+            
+                    # 检查敏感符号
+            if any(symbol in input_data for symbol in SENSITIVE_SYMBOLS):
+                raise InputCheckFailed(f"Input contains sensitive programming symbols: {', '.join(SENSITIVE_SYMBOLS)}.")
+
             for option in options:
                 if option.startswith("%"):
                     prefix = option[1:]
@@ -1328,7 +1335,7 @@ class TelechargeSystem:
         self.check_input_format(caller_number, "I =11")
         self.check_input_format(receiver_number, "I =11")
         self.check_input_format(call_duration, "I .0")
-        
+
         # Step 1: 检查呼出手机号是否停机
         self.cursor.execute("""
             SELECT IsSuspended, VoiceBalance, PackageID FROM PhoneAccounts WHERE PhoneNumber = %s
