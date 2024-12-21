@@ -102,8 +102,11 @@ class UserInterface:
     # 充值
     def confirm_recharge(self):
         phone = self.main_window.rechargePhoneEdit.text().strip()
+        phone = self.system.check_input_format(phone, 'phone')
         amount_text = self.main_window.rechargeAmountEdit.text().strip()
+        amount_text = self.system.check_input_format(amount_text, 'amount')
         payment_method = self.main_window.rechargeMethodEdit.text().strip()
+        payment_method = self.system.check_input_format(payment_method, 'payment_method')
         if not phone or not amount_text or not payment_method:
             QtWidgets.QMessageBox.warning(self.main_window, "输入错误", "请填写所有必填项。")
             return

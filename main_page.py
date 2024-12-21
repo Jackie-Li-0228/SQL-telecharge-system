@@ -49,7 +49,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def login(self):
         phone = self.loginTeleNumberEdit.text().strip()
+        phone = self.system.check_input_format(phone, 'phone')
         password = self.loginSecretEdit.text().strip()
+        password = self.system.check_input_format(password, 'password')
 
         if not phone or not password:
             QtWidgets.QMessageBox.warning(self, "输入错误", "请输入手机号码和密码。")
@@ -109,9 +111,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def register(self):
         # 注册逻辑
         phone = self.registerteleNumberEdit.text().strip()
+        phone = self.system.check_input_format(phone, 'phone')
         password = self.registersecretEdit.text().strip()
+        password = self.system.check_input_format(password, 'password')
         name = self.nameEdit.text().strip()
+        name = self.system.check_input_format(name, 'name')
         id_card = self.idCardEdit.text().strip()
+        id_card = self.system.check_input_format(id_card, 'id_card')
         package_id = self.taocancombox.currentData()
 
         if not phone or not password or not name or not id_card:
