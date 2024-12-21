@@ -1427,7 +1427,7 @@ class TelechargeSystem:
         try:
             # 查询该手机号对应的账户信息
             self.cursor.execute("""
-                SELECT PhoneNumber, Balance, IsSuspended, PackageID, PackageStartTime, PackageEndTime, VoiceBalance
+                SELECT PhoneNumber, Balance, PackageID, PackageStartTime, PackageEndTime, VoiceBalance, Password, IsSuspended
                 FROM PhoneAccounts
                 WHERE PhoneNumber = %s
             """, (phone_number,))
@@ -1437,15 +1437,16 @@ class TelechargeSystem:
             if result is None:
                 raise PhoneNumberNotFoundError(f"Phone number {phone_number} not found.")
             
-            phone_number, balance,issuspended , package_id, package_start_time, package_end_time, voice_balance = result
+            phone_number, balance, package_id, package_start_time, package_end_time, voice_balance, password, is_suspended = result
             return {
                 "PhoneNumber": phone_number,
                 "Balance": balance,
-                "IsSuspended": issuspended,
-                "VoiceBalance": voice_balance,
                 "PackageID": package_id,
                 "PackageStartTime": package_start_time,
-                "PackageEndTime": package_end_time
+                "PackageEndTime": package_end_time,
+                "VoiceBalance": voice_balance,
+                "Password": password,
+                "IsSuspended": is_suspended
             }
         
         except mysql.connector.Error as err:
@@ -1460,4 +1461,5 @@ class TelechargeSystem:
     #     print(account_info)
     # except Exception as e:
     #     print(f"An error occurred: {e}")
+    
     
