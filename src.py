@@ -465,6 +465,9 @@ class TelechargeSystem:
             # 计算下个月的第一天作为生效时间
             next_month = current_time.replace(day=1) + timedelta(days=32)
             activation_time = next_month.replace(day=1)
+            activation_time.replace(hour=0)
+            activation_time.replace(minute=0)
+            activation_time.replace(second=0)
 
             # 查询用户是否已经存在该手机号
             self.cursor.execute("SELECT PhoneNumber FROM PhoneAccounts WHERE PhoneNumber = %s", (phone_number,))
@@ -1279,4 +1282,6 @@ class TelechargeSystem:
     #     print(f"Error: {e}")
     # except ValueError as e:
     #     print(f"Error: {e}")
+
+
     
