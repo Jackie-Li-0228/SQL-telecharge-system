@@ -33,7 +33,7 @@ class CustomerServiceInterface:
 
     def fetch_customer_service_info(self):
         phone = self.customerServicePhoneEdit.text().strip()
-        phone = self.system.check_input_format(phone, 'phone')
+        self.system.check_input_format(phone, 'I')
         if not phone:
             QtWidgets.QMessageBox.warning(self.main_window, "输入错误", "请输入电话号码。")
             return
