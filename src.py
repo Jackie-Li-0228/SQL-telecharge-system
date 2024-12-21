@@ -1414,5 +1414,49 @@ class TelechargeSystem:
     # except ValueError as e:
     #     print(f"Error: {e}")
 
+    def get_phoneaccount_by_phone(self, phone_number):
+        """
+        获取指定手机号的账户信息
+        
+        :param phone_number: 用户手机号
+        :return: 账户信息
+        """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
 
+        try:
+            # 查询该手机号对应的账户信息
+            self.cursor.execute("""
+                SELECT PhoneNumber, Balance, PackageID, PackageStartTime, PackageEndTime, VoiceBalance
+                FROM PhoneAccounts
+                WHERE PhoneNumber = %s
+            """, (phone_number,))
+            
+            result = self.cursor.fetchone()
+            
+            if result is None:
+                raise PhoneNumberNotFoundError(f"Phone number {phone_number} not found.")
+            
+            phone_number, balance, package_id, package_start_time, package_end_time, voice_balance = result
+            return {
+                "PhoneNumber": phone_number,
+                "Balance": balance,
+                "PackageID": package_id,
+                "PackageStartTime": package_start_time,
+                "PackageEndTime": package_end_time,
+                "VoiceBalance": voice_balance
+            }
+        
+        except mysql.connector.Error as err:
+            print(f"Database error: {err}")
+        except PhoneNumberNotFoundError as e:
+            print(f"Error: {e}")
+
+    # 示例：获取某个手机号的账户信息
+    # phone_number = "13812345678"  # 输入手机号
+    # try:
+    #     account_info = get_phoneaccount_by_phone(phone_number)
+    #     print(account_info)
+    # except Exception as e:
+    #     print(f"An error occurred: {e}")
     
