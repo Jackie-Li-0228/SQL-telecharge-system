@@ -4,9 +4,9 @@ from decimal import Decimal
 from Exception_Classes import *
 import re
 
-SQL_KEYWORDS = {
-    'select', 'insert', 'delete', 'update', 'drop', 'alter', 'create', 'where', 'from', 'join',
-    'and', 'or', 'group', 'by', 'having', 'order', 'limit', 'like', 'union', 'into', 'values'
+SQL_KEYWORDS={
+    'select','insert','delete','update','drop','alter','create','where','from','join',
+    'and','or','group','by','having','order','limit','like','union','into','values'
 }
 
 class TelechargeSystem:
@@ -20,10 +20,13 @@ class TelechargeSystem:
         )
         self.cursor = self.db.cursor()
 
-    def check_input_format(input_data, format_str):
+    def check_input_format(self,input_data, format_str):
         # 1. SQL关键字检查
-        if any(keyword in str(input_data).lower() for keyword in SQL_KEYWORDS):
-            raise InputCheckFailed("Input contains SQL keywords.")
+        input_data_str = str(input_data).lower()
+        for keyword in SQL_KEYWORDS:
+            pattern = r'(^|\s)' + re.escape(keyword.lower()) + r'(\s|$)'
+            if re.search(pattern, input_data_str):
+                raise InputCheckFailed(f"Input contains SQL keyword '{keyword}'.")
 
         # 2. 解析format字符串
         format_parts = format_str.split()
@@ -32,7 +35,7 @@ class TelechargeSystem:
 
         # 获取类型检查部分
         input_type = format_parts[0].upper()
-        if input_type not in ['S', 'I']:
+        if input_type not in ['S', 'I', 'T']:
             raise InputCheckFailed(f"Invalid type {input_type} in format.")
 
         # 解析选项部分
@@ -50,15 +53,18 @@ class TelechargeSystem:
                         raise InputCheckFailed(f"String does not start with '{prefix}'.")
                 elif option.startswith(":"):
                     length = int(option[1:])
+                    if len(input_data) > length:
+                        raise InputCheckFailed(f"String length must be less than {length}.")
+                elif option.startswith("="):
+                    length = int(option[1:])
                     if len(input_data) != length:
-                        raise InputCheckFailed(f"String length must be {length}.")
+                        raise InputCheckFailed(f"String length must be exactly {length}.")
         elif input_type == 'I':
             # 数字检查（允许小数）
             if not isinstance(input_data, (int, float, str)):
                 raise InputCheckFailed(f"Expected a number but got {type(input_data).__name__}.")
             # 转为字符串后检查
             input_data = str(input_data)
-
             # 检查是否为有效的数字（可以包含一个小数点）
             if not re.match(r'^\d+(\.\d+)?$', input_data):
                 raise InputCheckFailed(f"Invalid number format: {input_data}.")
@@ -70,8 +76,8 @@ class TelechargeSystem:
                         raise InputCheckFailed(f"Number does not start with '{prefix}'.")
                 elif option.startswith(":"):
                     length = int(option[1:])
-                    if len(input_data) != length:
-                        raise InputCheckFailed(f"Number length must be {length}.")
+                    if len(input_data) > length:
+                        raise InputCheckFailed(f"Number length must be less than {length}.")
                 elif option.startswith("."):
                     # 检查小数点后的位数
                     decimal_places = int(option[1:])
@@ -84,6 +90,22 @@ class TelechargeSystem:
                         # 如果没有小数点，确保没有多于的位数
                         if decimal_places > 0:
                             raise InputCheckFailed(f"Number should have exactly {decimal_places} decimal places.")
+                elif option.startswith("="):
+                    length = int(option[1:])
+                    if len(input_data) != length:
+                        raise InputCheckFailed(f"String length must be exactly {length}.")
+        elif input_type == 'T':
+            # 检查时间类型
+            if not isinstance(input_data, str):
+                raise InputCheckFailed(f"Expected string input for time, but got {type(input_data).__name__}.")
+            
+            # 正则表达式检查日期时间格式 YYYY-MM-DD HH:MM:SS
+            try:
+                datetime.strptime(input_data, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                raise InputCheckFailed(f"Time format must be 'YYYY-MM-DD HH:MM:SS', but got {input_data}.")
+        else:
+            raise InputCheckFailed(f"Invalid type {input_type} in format.")
                     
                     
     def create_new_phone_account(self,phone_number, name, id_card_number, password, package_id=None):
@@ -101,6 +123,13 @@ class TelechargeSystem:
         - UserNotFoundError: If the user with the given ID card number does not exist.
         - DatabaseError: If any database operation fails.
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+        self.check_input_format(name, "S :100")
+        self.check_input_format(id_card_number, "S =18")
+        self.check_input_format(password, "S :255")
+        if package_id is not None:
+            self.check_input_format(package_id, "S %T")
 
         # 获取当前时间
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -177,6 +206,11 @@ class TelechargeSystem:
         - PhoneNumberNotFoundError: If the phone number is not found in the database.
         - PaymentProcessingError: If there is an error during the payment processing (e.g., database issues).
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+        self.check_input_format(amount, "I .2")
+        self.check_input_format(payment_method, "S :100")
+
         if amount <= 0:
             # 充值额度不能为负数
             raise ValueError("Payment amount must be greater than zero.")
@@ -242,6 +276,8 @@ class TelechargeSystem:
         Raises:
         - PhoneNumberNotFoundError: If the phone number is not found in the database.
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
 
         # 查询手机号对应的用户的身份证号和用户类型ID
         self.cursor.execute("""
@@ -293,7 +329,17 @@ class TelechargeSystem:
         - UserTypeNotFoundError: If the provided user type does not exist in the database.
         - DatabaseError: If there is any database-related error during registration.
         """
-        
+        # 检查输入类型
+        self.check_input_format(id_card_number, "S =18")
+        self.check_input_format(name, "S :100")
+        self.check_input_format(age, "I :3")
+        self.check_input_format(gender, "S =1")
+        if gender not in ['M', 'F']:
+            raise InputCheckFailed(message="gender must be 'M' or 'F'.")
+        self.check_input_format(user_type_name, "S :5")
+        if user_type_name not in ['普通用户', '客服', '超级管理员']:
+            raise InputCheckFailed(message="Invalid user type.")
+                
         # 查询用户类型的ID（默认是“普通用户”）
         self.cursor.execute("SELECT UserTypeID FROM UserTypes WHERE UserTypeName = %s", (user_type_name,))
         user_type_result = self.cursor.fetchone()
@@ -342,6 +388,9 @@ class TelechargeSystem:
         - PhoneNumberNotFoundError: If the phone number is not found in the PhoneAccounts table.
         - DatabaseError: If there is any database-related error during the query.
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+
         try:
             # 查询手机号对应的套餐和账户信息
             self.cursor.execute("""
@@ -458,6 +507,10 @@ class TelechargeSystem:
         Raises:
         - DatabaseError: If there is any database-related error during the query or insertion.
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+        self.check_input_format(new_package_id, "S %T")
+
         try:
             # 获取当前时间
             current_time = datetime.now()
@@ -511,6 +564,9 @@ class TelechargeSystem:
     #     print(f"Database error: {e}")
 
     def change_package_for_all(self,phone_number):
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+
         try:
             # 获取今天的日期，判断是否是每月的第一天
             current_date = datetime.now()
@@ -611,6 +667,11 @@ class TelechargeSystem:
         '''
             给定主叫号码、被叫号码和通话时长，记录通话记录到数据库中。
         '''
+        # 检查输入类型
+        self.check_input_format(caller, "I =11")
+        self.check_input_format(receiver, "I =11")
+        self.check_input_format(call_duration_minutes, "I .0")
+
         try:
             # 检查号码是否有效
             self.cursor.execute("SELECT 1 FROM PhoneAccounts WHERE PhoneNumber = %s", (caller,))
@@ -665,6 +726,20 @@ class TelechargeSystem:
         :param expiration_time: 下架时间（可选，默认为NULL）
         :param launch_time: 上架时间（可选，默认为当前时间）
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+        self.check_input_format(package_id, "S %T")
+        self.check_input_format(package_name, "S :100")
+        self.check_input_format(price, "I .2")
+        self.check_input_format(contract_duration, "I :3")
+        self.check_input_format(voice_quota, "I .2")
+        self.check_input_format(over_quota_standard, "I .2")
+        if expiration_time is not None:
+            self.check_input_format(expiration_time, "T")
+        if launch_time is not None:
+            self.check_input_format(launch_time, "T")
+        
+
         # 确认手机号是否是管理员
         self.cursor.execute("""SELECT UserTypeID FROM PhoneAccounts WHERE PhoneNumber = %s""", (phone_number,))
         user_type_id = self.cursor.fetchone()[0]
@@ -710,6 +785,10 @@ class TelechargeSystem:
         :param phone_number: 用户手机号
         :param package_id: 套餐ID
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+        self.check_input_format(package_id, "S %T")
+
         try:
             # 查询该手机号对应的用户的 UserTypeID
             self.cursor.execute("""
@@ -771,6 +850,13 @@ class TelechargeSystem:
         :param phone_number: 用户手机号
         :return: 通话记录列表
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+        if year is not None:
+            self.check_input_format(year, "I =4")
+        if month is not None:
+            self.check_input_format(month, "I :2")
+
         try:
             # 查询与该手机号相关的所有通话记录
             self.cursor.execute("""
@@ -835,6 +921,13 @@ class TelechargeSystem:
         :param phone_number: 用户手机号
         :return: 缴费记录列表
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+        if year is not None:
+            self.check_input_format(year, "I =4")
+        if month is not None:
+            self.check_input_format(month, "I :2")
+            
         try:
             # 查询与该手机号相关的所有缴费记录
             self.cursor.execute("""
@@ -900,6 +993,13 @@ class TelechargeSystem:
         :param phone_number: 用户手机号
         :return: 交易记录列表
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+        if year is not None:
+            self.check_input_format(year, "I =4")
+        if month is not None:
+            self.check_input_format(month, "I :2")
+
         try:
             # 查询与该手机号相关的所有交易记录
             self.cursor.execute("""
@@ -965,6 +1065,13 @@ class TelechargeSystem:
         :param phone_number: 用户手机号
         :return: 服务记录列表
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+        if year is not None:
+            self.check_input_format(year, "I =4")
+        if month is not None:
+            self.check_input_format(month, "I :2")
+
         try:
             # 查询与该手机号相关的所有手机号-服务表记录
             self.cursor.execute("""
@@ -1035,6 +1142,14 @@ class TelechargeSystem:
         :param activation_method_id: 激活方式ID（1表示立即生效，2表示次月生效）
         :return: None
         """
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+        self.check_input_format(service_id, "S %S")
+        self.check_input_format(service_name, "S :100")
+        self.check_input_format(price, "I .2")
+        self.check_input_format(quota, "I .2")
+        self.check_input_format(activation_method_id, "I =1")
+        
         try:
             # 检查手机号是否为管理员
             self.cursor.execute("""
@@ -1136,6 +1251,10 @@ class TelechargeSystem:
     # get_available_services()
 
     def subscribe_service(self, phone_number, service_id):
+        # 检查输入类型
+        self.check_input_format(phone_number, "I =11")
+        self.check_input_format(service_id, "S %S")
+
         # 查询业务信息
         self.cursor.execute("""
             SELECT IsSuspended FROM PhoneAccounts WHERE PhoneNumber = %s
@@ -1205,6 +1324,11 @@ class TelechargeSystem:
     #     print(f"Error: {e}")
 
     def simulate_call(self, caller_number, receiver_number, call_duration):
+        # 检查输入类型
+        self.check_input_format(caller_number, "I =11")
+        self.check_input_format(receiver_number, "I =11")
+        self.check_input_format(call_duration, "I .0")
+        
         # Step 1: 检查呼出手机号是否停机
         self.cursor.execute("""
             SELECT IsSuspended, VoiceBalance, PackageID FROM PhoneAccounts WHERE PhoneNumber = %s
