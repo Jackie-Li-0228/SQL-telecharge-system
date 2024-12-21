@@ -1,4 +1,4 @@
-from PyQt6 import QtWidgets, QtCore
+from PyQt6 import QtWidgets, QtCore, QtGui
 from Exception_Classes import *
 from src import TelechargeSystem
 
@@ -52,7 +52,7 @@ class AdminInterface:
             user_info = self.system.get_user_info_by_phone(phone)
             transaction_records = self.system.get_transaction_records_by_phone(phone)
 
-            self.display_user_info(user_info)
+            self.display_user_info_admin(user_info)
             self.display_transaction_records(transaction_records)
 
             QtWidgets.QMessageBox.information(self.main_window, "信息获取成功", "已成功获取并展示相关信息。")
@@ -63,7 +63,7 @@ class AdminInterface:
         except Exception as e:
             QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
 
-    def display_user_info(self, user_info):
+    def display_user_info_admin(self, user_info):
         layout = self.adminInfoWidget.layout()
         if not layout:
             layout = QtWidgets.QVBoxLayout()
@@ -74,15 +74,22 @@ class AdminInterface:
                 if child.widget():
                     child.widget().deleteLater()
 
+        list_view = QtWidgets.QListView()
+        model = QtGui.QStandardItemModel(list_view)
+
         for key, value in user_info.items():
-            label = QtWidgets.QLabel(f"{key}: {value}")
-            layout.addWidget(label)
+            item_text = f"{key}: {value}"
+            item = QtGui.QStandardItem(item_text)
+            model.appendRow(item)
+
+        list_view.setModel(model)
+        layout.addWidget(list_view)
 
     def display_transaction_records(self, transaction_records):
-        layout = self.adminInfoWidget.layout()
+        layout = self.adminTransactionsWidget.layout()
         if not layout:
             layout = QtWidgets.QVBoxLayout()
-            self.adminInfoWidget.setLayout(layout)
+            self.adminTransactionsWidget.setLayout(layout)
         else:
             while layout.count():
                 child = layout.takeAt(0)

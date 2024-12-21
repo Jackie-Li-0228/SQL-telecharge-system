@@ -10,6 +10,7 @@ class UserInterface:
         self.setup_ui()
         
     def back_to_user(self):
+        self.setup_ui()
         self.main_window.tabWidget.setCurrentWidget(self.main_window.tab_user)
 
     def setup_ui(self):

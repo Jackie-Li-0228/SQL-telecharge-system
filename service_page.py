@@ -1,4 +1,4 @@
-from PyQt6 import QtWidgets
+from PyQt6 import QtWidgets, QtGui
 from Exception_Classes import *
 from src import TelechargeSystem
 
@@ -15,7 +15,7 @@ class CustomerServiceInterface:
         self.customerServiceTransactionsWidget = self.main_window.findChild(QtWidgets.QWidget, 'customerServiceTransactionsWidget')
         self.allPackagesWidget = self.main_window.findChild(QtWidgets.QWidget, 'allPackagesWidget')
         self.allServicesWidget = self.main_window.findChild(QtWidgets.QWidget, 'allServicesWidget')
-        self.main_window.logoutButton_user.clicked.connect(self.logout)
+        self.main_window.logoutButton_service.clicked.connect(self.logout)
         
         # 展示所有套餐
         self.display_all_packages()
@@ -65,9 +65,16 @@ class CustomerServiceInterface:
                 if child.widget():
                     child.widget().deleteLater()
 
+        list_view = QtWidgets.QListView()
+        model = QtGui.QStandardItemModel(list_view)
+
         for key, value in user_info.items():
-            label = QtWidgets.QLabel(f"{key}: {value}")
-            layout.addWidget(label)
+            item_text = f"{key}: {value}"
+            item = QtGui.QStandardItem(item_text)
+            model.appendRow(item)
+
+        list_view.setModel(model)
+        layout.addWidget(list_view)
 
     def display_transaction_records(self, transaction_records):
         layout = self.customerServiceTransactionsWidget.layout()
