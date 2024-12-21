@@ -1141,7 +1141,7 @@ class TelechargeSystem:
             SELECT IsSuspended FROM PhoneAccounts WHERE PhoneNumber = %s
         """, (phone_number,))
         suspend = self.cursor.fetchone()
-        if suspend[0] < 0:
+        if suspend[0] == 1 :
             raise PhoneSuspendedError(f"Phone number {phone_number} is suspended.")
 
         self.cursor.execute("""
