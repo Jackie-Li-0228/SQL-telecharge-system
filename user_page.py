@@ -17,6 +17,7 @@ class UserInterface:
         self.main_window.rechargeButton.clicked.connect(self.switch_to_recharge)
         self.main_window.billInquiryButton.clicked.connect(self.switch_to_bill_inquiry)
         self.main_window.businessHandlingButton.clicked.connect(self.switch_to_business_handling)
+        self.main_window.callRecordsButton.clicked.connect(self.show_call_records)
         self.main_window.logoutButton_user.clicked.connect(self.logout)
         
         # 账号停机判定
@@ -38,6 +39,7 @@ class UserInterface:
 
     def back_to_user(self):
         self.main_window.tabWidget.setCurrentWidget(self.main_window.tab_user)
+        self.refresh_user_page()
     
     def show(self):
         self.main_window.tabWidget.setCurrentIndex(3)
@@ -45,14 +47,53 @@ class UserInterface:
 
     def refresh_user_page(self):
         if self.accountStatusLabel:
+            result = self.system.get_phoneaccount_by_phone(self.main_window.current_user_phone)
+            self.main_window.is_suspended = result['IsSuspended']
             user_status = self.main_window.is_suspended
-            if user_status == 1:
-                QtWidgets.QMessageBox.warning(self.main_window, "账号已停机。")
-                self.accountStatusLabel.setText("状态: 停机")
-            else:
+            if user_status == 0:
                 self.accountStatusLabel.setText("状态: 正常")
+            else:
+                self.accountStatusLabel.setText("状态: 停机")
 
-
+    def show_call_records(self):
+        phone = self.main_window.current_user_phone
+        try:
+            # 调用 src.py 中的方法获取通话记录
+            call_records = self.system.get_call_records_by_phone(phone)
+        
+            # 格式化通话记录
+            record_strings = [
+                f"时间: {record['CallTime']}, 时长: {record['CallDuration']} 分钟, 呼叫方: {record['Caller']}, 接收方: {record['Receiver']}"
+                for record in call_records
+            ]
+        
+            # 获取 ListView
+            call_records_list_view = self.main_window.findChild(QtWidgets.QListView, 'callRecordsListView')
+            if not call_records_list_view:
+                # 如果 ListView 不存在，创建一个并添加到布局
+                call_records_list_view = QtWidgets.QListView()
+                call_records_list_view.setObjectName('callRecordsListView')
+                bill_inquiry_layout = self.main_window.findChild(QtWidgets.QVBoxLayout, 'billInquiryLayout')  # 确认布局名称
+                if bill_inquiry_layout:
+                    bill_inquiry_layout.addWidget(call_records_list_view)
+                else:
+                    QtWidgets.QMessageBox.critical(self.main_window, "错误", "找到账单查询界面的布局 billInquiryLayout")
+                    return
+        
+            # 设置 ListView 的模型
+            model = QtCore.QStringListModel()
+            model.setStringList(record_strings)
+            call_records_list_view.setModel(model)
+        
+            # 切换到账单查询界面
+            self.switch_to_bill_inquiry()
+        
+        except PhoneNumberNotFoundError as e:
+            QtWidgets.QMessageBox.warning(self.main_window, "错误", str(e))
+        except DatabaseError as e:
+            QtWidgets.QMessageBox.critical(self.main_window, "数据库错误", str(e))
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
 
     def show_my_package(self):
         phone = self.main_window.current_user_phone

@@ -22,7 +22,7 @@
   <property name="styleSheet">
    <string notr="true">
     /* 全局背景颜色 */
-    background-color: rgb(14, 105, 195);
+    background-color: rgb(0, 0, 0);
 
     /* 无框按钮样式（特定按钮） */
     QPushButton#registerButton, QPushButton#backtoLoginButton, QPushButton#logoutButton_user,QPushButton#logoutButton_service,QPushButton#logoutButton_admin,QPushButton#backToUserButton_recharge,QPushButton#backToUserButton_billInquiry,QPushButton#backToUserButton_businessHandling
@@ -33,7 +33,7 @@
         border-radius: 20px;
         padding: 5px;
     }
-   </string>
+   color:rgb(255, 255, 255);</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -55,7 +55,7 @@
        </string>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tab_login">
        <property name="styleSheet">
@@ -670,7 +670,7 @@ padding: 5px;</string>
          <widget class="QPushButton" name="backtologinButton">
           <property name="styleSheet">
            <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(0, 0, 0)</string>
+color: rgb(255, 255, 255);</string>
           </property>
           <property name="text">
            <string>Back to login</string>
@@ -693,33 +693,6 @@ color: rgb(0, 0, 0)</string>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <spacer name="horizontalSpacer_15">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="myPackageButton">
-            <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
-border-radius: 10px;
-background-color: #00008B;
-color: #FFFFFF;
-padding: 5px;</string>
-            </property>
-            <property name="text">
-             <string>我的套餐</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer name="horizontalSpacer_11">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -733,16 +706,145 @@ padding: 5px;</string>
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="balanceButton">
-            <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QPushButton" name="myPackageButton">
+              <property name="styleSheet">
+               <string notr="true">border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
 padding: 5px;</string>
+              </property>
+              <property name="text">
+               <string>我的套餐</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="balanceButton">
+              <property name="styleSheet">
+               <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+              </property>
+              <property name="text">
+               <string>话费余额</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="callBalanceButton">
+              <property name="styleSheet">
+               <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+              </property>
+              <property name="text">
+               <string>语音余额</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="rechargeButton">
+              <property name="styleSheet">
+               <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+              </property>
+              <property name="text">
+               <string>话费充值</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="callRecordsButton">
+              <property name="styleSheet">
+               <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+              </property>
+              <property name="text">
+               <string>通话记录</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="billInquiryButton">
+              <property name="styleSheet">
+               <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+              </property>
+              <property name="text">
+               <string>账单查询</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="businessHandlingButton">
+              <property name="styleSheet">
+               <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+              </property>
+              <property name="text">
+               <string>业务办理</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_13">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-            <property name="text">
-             <string>话费余额</string>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="tab3_Label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>150</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>300</width>
+              <height>300</height>
+             </size>
+            </property>
+            <property name="pixmap">
+             <pixmap>picture/非电话5.jpg</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -759,132 +861,20 @@ padding: 5px;</string>
             </property>
            </spacer>
           </item>
-          <item>
-           <widget class="QPushButton" name="callBalanceButton">
-            <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
-border-radius: 10px;
-background-color: #00008B;
-color: #FFFFFF;
-padding: 5px;</string>
-            </property>
-            <property name="text">
-             <string>通话余额</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_18">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <spacer name="horizontalSpacer_16">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="rechargeButton">
-            <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
-border-radius: 10px;
-background-color: #00008B;
-color: #FFFFFF;
-padding: 5px;</string>
-            </property>
-            <property name="text">
-             <string>话费充值</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_13">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="billInquiryButton">
-            <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
-border-radius: 10px;
-background-color: #00008B;
-color: #FFFFFF;
-padding: 5px;</string>
-            </property>
-            <property name="text">
-             <string>账单查询</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_14">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="businessHandlingButton">
-            <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
-border-radius: 10px;
-background-color: #00008B;
-color: #FFFFFF;
-padding: 5px;</string>
-            </property>
-            <property name="text">
-             <string>业务办理</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_17">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
+         <spacer name="verticalSpacer_19">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item alignment="Qt::AlignHCenter">
          <widget class="QLabel" name="accountStatusLabel_user">
@@ -896,40 +886,16 @@ color: #FFFFFF;
 padding: 5px;</string>
           </property>
           <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item alignment="Qt::AlignHCenter">
-         <widget class="QLabel" name="tab3_Label">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>150</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>300</width>
-            <height>300</height>
-           </size>
-          </property>
-          <property name="pixmap">
-           <pixmap>picture/非电话5.jpg</pixmap>
-          </property>
-          <property name="scaledContents">
-           <bool>true</bool>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;TextLabel&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
         <item alignment="Qt::AlignRight">
          <widget class="QPushButton" name="logoutButton_user">
+          <property name="styleSheet">
+           <string notr="true">font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255);</string>
+          </property>
           <property name="text">
            <string>Log out</string>
           </property>
@@ -1079,8 +1045,8 @@ color: #000000;</string>
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">        border: none;
-        color: #FFFFFF;</string>
+           <string notr="true">font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255);</string>
           </property>
           <property name="text">
            <string>Log out</string>
@@ -1099,47 +1065,114 @@ color: #000000;</string>
        <attribute name="title">
         <string>Admin</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8"/>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_21">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="adminFetchButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item alignment="Qt::AlignLeft">
+           <widget class="QComboBox" name="userComboBox">
             <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
+             <string notr="true">QComboBox {
+border: 2px solid #000000;
 border-radius: 10px;
-background-color: #00008B;
-color: #FFFFFF;
-padding: 5px;</string>
-            </property>
-            <property name="text">
-             <string>查找</string>
+background-color: #FFFFFF;
+color: #000000;
+padding: 5px;
+font: 75 9pt &quot;Times New Roman&quot;;
+           }
+QAbstractItemView {
+              background-color: white;
+              color: black;
+           }
+
+           </string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="adminPhoneEdit">
+           <spacer name="verticalSpacer_16">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item alignment="Qt::AlignLeft">
+           <widget class="QComboBox" name="businessComboBox">
+            <property name="styleSheet">
+             <string notr="true">QComboBox {
+border: 2px solid #000000;
+border-radius: 10px;
+background-color: #FFFFFF;
+color: #000000;
+padding: 5px;
+font: 75 9pt &quot;Times New Roman&quot;;
+           }
+QAbstractItemView {
+              background-color: white;
+              color: black;
+           }
+
+           </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_17">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item alignment="Qt::AlignLeft">
+           <widget class="QComboBox" name="packageComboBox">
+            <property name="styleSheet">
+             <string notr="true">QComboBox {
+border: 2px solid #000000;
+border-radius: 10px;
+background-color: #FFFFFF;
+color: #000000;
+padding: 5px;
+font: 75 9pt &quot;Times New Roman&quot;;
+           }
+QAbstractItemView {
+              background-color: white;
+              color: black;
+           }
+
+           </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_18">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_12">
+          <item>
+           <widget class="QLineEdit" name="lineEdit">
             <property name="styleSheet">
              <string notr="true">border: 2px solid #000000;
 border-radius: 10px;
@@ -1147,150 +1180,33 @@ background-color: #FFFFFF;
 color: #000000;
 padding: 5px;</string>
             </property>
-            <property name="placeholderText">
-             <string>输入查询手机号</string>
-            </property>
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_22">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="2" column="1">
-           <widget class="QTableWidget" name="adminAllServicesWidget">
+           <widget class="QListView" name="displayListView">
             <property name="styleSheet">
-             <string notr="true">QTableWidget {
+             <string notr="true">
     border: 2px solid #000000;
     border-radius: 10px;
     background-color: #FFFFFF;
     color: #000000;
     padding: 5px;
-}
 </string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="removeServiceButton">
+          <item alignment="Qt::AlignRight">
+           <widget class="QPushButton" name="logoutButton_admin">
             <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
-border-radius: 10px;
-background-color: #00008B;
-color: #FFFFFF;
-padding: 5px;</string>
+             <string notr="true">font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255);</string>
             </property>
             <property name="text">
-             <string>下架业务</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QTableWidget" name="adminAllPackagesWidget">
-            <property name="styleSheet">
-             <string notr="true">QTableWidget {
-    border: 2px solid #000000;
-    border-radius: 10px;
-    background-color: #FFFFFF;
-    color: #000000;
-    padding: 5px;
-}
-</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QTableWidget" name="adminTransactionsWidget">
-            <property name="styleSheet">
-             <string notr="true">QTableWidget {
-    border: 2px solid #000000;
-    border-radius: 10px;
-    background-color: #FFFFFF;
-    color: #000000;
-    padding: 5px;
-}
-</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QPushButton" name="removePackageButton">
-            <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
-border-radius: 10px;
-background-color: #00008B;
-color: #FFFFFF;
-padding: 5px;</string>
-            </property>
-            <property name="text">
-             <string>下架套餐</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QPushButton" name="publishPackageButton">
-            <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
-border-radius: 10px;
-background-color: #00008B;
-color: #FFFFFF;
-padding: 5px;</string>
-            </property>
-            <property name="text">
-             <string>发布套餐</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QPushButton" name="publishServiceButton">
-            <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
-border-radius: 10px;
-background-color: #00008B;
-color: #FFFFFF;
-padding: 5px;</string>
-            </property>
-            <property name="text">
-             <string>发布业务</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QListView" name="adminInfoWidget">
-            <property name="styleSheet">
-             <string notr="true">QListView
- {
-    border: 2px solid #000000;
-    border-radius: 10px;
-    background-color: #FFFFFF;
-    color: #000000;
-    padding: 5px;
-}
-color: #000000;
-</string>
+             <string>Log out</string>
             </property>
            </widget>
           </item>
          </layout>
-        </item>
-        <item alignment="Qt::AlignRight">
-         <widget class="QPushButton" name="logoutButton_admin">
-          <property name="text">
-           <string>Log out</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </widget>
@@ -1546,7 +1462,7 @@ padding: 5px;</string>
          <widget class="QPushButton" name="backToUserButton_recharge">
           <property name="styleSheet">
            <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(0, 0, 0)</string>
+color: rgb(255, 255, 255);</string>
           </property>
           <property name="text">
            <string>Back</string>
@@ -1588,7 +1504,7 @@ color: rgb(0, 0, 0)</string>
          <widget class="QPushButton" name="backToUserButton_billInquiry">
           <property name="styleSheet">
            <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(0, 0, 0)</string>
+color: rgb(255, 255, 255);</string>
           </property>
           <property name="text">
            <string>Back</string>
@@ -1666,7 +1582,7 @@ padding: 5px;</string>
          <widget class="QPushButton" name="backToUserButton_businessHandling">
           <property name="styleSheet">
            <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(0, 0, 0)</string>
+color: rgb(255, 255, 255);</string>
           </property>
           <property name="text">
            <string>Back</string>
