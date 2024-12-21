@@ -32,6 +32,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 初始化系统
         self.system = TelechargeSystem()
         self.current_user_phone = None
+        self.is_suspended = False
 
         # 初始化界面
         self.user_interface = UserInterface(self)
@@ -58,41 +59,21 @@ class MainWindow(QtWidgets.QMainWindow):
             return
 
         try:
-            connection = pymysql.connect(
-                host="localhost",
-                user="root",
-                password="123123",
-                database="telecharge",
-                cursorclass=pymysql.cursors.DictCursor
-            )
-            with connection.cursor() as cursor:
-                sql = "SELECT UserTypeID, Password FROM PhoneAccounts WHERE PhoneNumber=%s"
-                cursor.execute(sql, (phone,))
-                result = cursor.fetchone()
+            result = self.system.get_phoneaccount_by_phone(phone)
+            if result['Password'] != password:
+                raise ValueError("密码错误。")
+            self.current_user_phone = phone
+            self.is_suspended = result['IsSuspended']
 
-                if not result:
-                    raise UserNotFoundError("用户未找到。")
-
-                if result['Password'] != password:
-                    raise ValueError("密码错误。")
-
-
-                user_type_id = result['UserTypeID']
-                cursor.execute("SELECT UserTypeName FROM UserTypes WHERE UserTypeID=%s", (user_type_id,))
-                user_type_result = cursor.fetchone()
-                self.current_user_phone = phone
-
-                if not user_type_result:
-                    raise UserTypeNotFoundError("用户类型未找到。")
-                user_type = user_type_result['UserTypeName']
-                if user_type == '普通用户':
-                    self.user_interface.show()
-                elif user_type == '客服':
-                    self.service_interface.show()
-                elif user_type == '超级管理员':
-                    self.admin_interface.show()
-                else:
-                    raise ValueError("未知的用户类型。")
+            user_type = self.system.get_user_info_by_phone(phone)['UserType']
+            if user_type == '普通用户':
+                self.user_interface.show()
+            elif user_type == '客服':
+                self.service_interface.show()
+            elif user_type == '超级管理员':
+                self.admin_interface.show()
+            else:
+                raise ValueError("未知的用户类型。")
 
         except UserNotFoundError as e:
             QtWidgets.QMessageBox.warning(self, "登录失败，用户不存在", str(e))
@@ -102,8 +83,6 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.critical(self, "数据库错误", str(e))
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "未知错误，请联系技术人员解决", str(e))
-        finally:
-            connection.close()
 
     def gotoregister(self):
         self.tabWidget.setCurrentWidget(self.findChild(QtWidgets.QWidget, 'tab_register'))

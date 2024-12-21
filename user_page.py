@@ -45,17 +45,13 @@ class UserInterface:
 
     def refresh_user_page(self):
         if self.accountStatusLabel:
-            phone = self.main_window.current_user_phone
-            try:
-                result = self.system.get_user_info_by_phone(phone)
-                user_status = result.get('IsSuspended', '0')
-                if user_status == '1':
-                    QtWidgets.QMessageBox.warning(self.main_window, "账号已停机。")
-                    self.accountStatusLabel.setText("状态: 停机")
-                else:
-                    self.accountStatusLabel.setText("状态: 正常")
-            except Exception as e:
-                QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))    
+            user_status = self.main_window.is_suspended
+            if user_status == 1:
+                QtWidgets.QMessageBox.warning(self.main_window, "账号已停机。")
+                self.accountStatusLabel.setText("状态: 停机")
+            else:
+                self.accountStatusLabel.setText("状态: 正常")
+
 
 
     def show_my_package(self):
