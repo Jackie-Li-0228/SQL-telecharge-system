@@ -56,7 +56,7 @@
 		background-color:rgb(0, 0, 0)</string>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="tab_login">
        <property name="styleSheet">
@@ -235,13 +235,11 @@
          <widget class="QLabel" name="label_2">
           <property name="styleSheet">
            <string notr="true">
-           font: 75 9pt &quot;Times New Roman&quot;;
+           font: 175 9pt &quot;Times New Roman&quot;;
            </string>
           </property>
           <property name="text">
-           <string>
-           &lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;Telecharge DataBase&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
-           </string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Telecharge DataBase&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
@@ -294,6 +292,19 @@ padding: 5px;</string>
            </spacer>
           </item>
          </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -349,6 +360,19 @@ padding: 5px;</string>
          </layout>
         </item>
         <item>
+         <spacer name="verticalSpacer_14">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_10">
           <item>
            <spacer name="horizontalSpacer_21">
@@ -372,11 +396,16 @@ padding: 5px;</string>
              </sizepolicy>
             </property>
             <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
+             <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
             </property>
             <property name="text">
              <string>Login</string>
@@ -398,11 +427,29 @@ padding: 5px;</string>
           </item>
          </layout>
         </item>
+        <item>
+         <spacer name="verticalSpacer_13">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item alignment="Qt::AlignRight">
          <widget class="QPushButton" name="gotoregisterButton">
           <property name="styleSheet">
-           <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(255, 255, 255)</string>
+           <string notr="true">QPushButton{
+font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255)
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
           </property>
           <property name="text">
            <string>No account? Click here</string>
@@ -570,11 +617,16 @@ padding: 5px;</string>
            </sizepolicy>
           </property>
           <property name="styleSheet">
-           <string notr="true">border: 2px solid #00008B;
+           <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
           </property>
           <property name="text">
            <string>Register</string>
@@ -660,8 +712,13 @@ padding: 5px;</string>
         <item row="13" column="2">
          <widget class="QPushButton" name="backtologinButton">
           <property name="styleSheet">
-           <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(255, 255, 255);</string>
+           <string notr="true">QPushButton{
+font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255)
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
           </property>
           <property name="text">
            <string>Back to login</string>
@@ -905,11 +962,16 @@ QAbstractItemView {
             <item>
              <widget class="QPushButton" name="myPackageButton">
               <property name="styleSheet">
-               <string notr="true">border: 2px solid #00008B;
+               <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
               </property>
               <property name="text">
                <string>我的套餐</string>
@@ -919,11 +981,16 @@ padding: 5px;</string>
             <item>
              <widget class="QPushButton" name="balanceButton">
               <property name="styleSheet">
-               <string notr="true">border: 2px solid #00008B;
+               <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
               </property>
               <property name="text">
                <string>话费余额</string>
@@ -933,11 +1000,16 @@ padding: 5px;</string>
             <item>
              <widget class="QPushButton" name="callBalanceButton">
               <property name="styleSheet">
-               <string notr="true">border: 2px solid #00008B;
+               <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
               </property>
               <property name="text">
                <string>语音余额</string>
@@ -947,11 +1019,16 @@ padding: 5px;</string>
             <item>
              <widget class="QPushButton" name="rechargeButton">
               <property name="styleSheet">
-               <string notr="true">border: 2px solid #00008B;
+               <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
               </property>
               <property name="text">
                <string>话费充值</string>
@@ -961,11 +1038,16 @@ padding: 5px;</string>
             <item>
              <widget class="QPushButton" name="callRecordsButton">
               <property name="styleSheet">
-               <string notr="true">border: 2px solid #00008B;
+               <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
               </property>
               <property name="text">
                <string>通话记录</string>
@@ -975,11 +1057,16 @@ padding: 5px;</string>
             <item>
              <widget class="QPushButton" name="billInquiryButton">
               <property name="styleSheet">
-               <string notr="true">border: 2px solid #00008B;
+               <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
               </property>
               <property name="text">
                <string>账单查询</string>
@@ -989,11 +1076,16 @@ padding: 5px;</string>
             <item>
              <widget class="QPushButton" name="businessHandlingButton">
               <property name="styleSheet">
-               <string notr="true">border: 2px solid #00008B;
+               <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
               </property>
               <property name="text">
                <string>业务办理</string>
@@ -1059,11 +1151,16 @@ padding: 5px;</string>
           <item alignment="Qt::AlignTop">
            <widget class="QPushButton" name="refreshButton_user">
             <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
+             <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
             </property>
             <property name="text">
              <string>刷新</string>
@@ -1102,8 +1199,13 @@ padding: 5px;</string>
         <item alignment="Qt::AlignRight">
          <widget class="QPushButton" name="logoutButton_user">
           <property name="styleSheet">
-           <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(255, 255, 255);</string>
+           <string notr="true">QPushButton{
+font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255)
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
           </property>
           <property name="text">
            <string>Log out</string>
@@ -1144,11 +1246,16 @@ color: rgb(255, 255, 255);</string>
              </sizepolicy>
             </property>
             <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
+             <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
             </property>
             <property name="text">
              <string>查找</string>
@@ -1185,11 +1292,16 @@ padding: 5px;</string>
           <item>
            <widget class="QPushButton" name="refreshButton_service">
             <property name="styleSheet">
-             <string notr="true">border: 2px solid #00008B;
+             <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
             </property>
             <property name="text">
              <string>刷新</string>
@@ -1268,8 +1380,13 @@ color: #000000;</string>
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(255, 255, 255);</string>
+           <string notr="true">QPushButton{
+font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255)
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
           </property>
           <property name="text">
            <string>Log out</string>
@@ -1390,6 +1507,25 @@ QAbstractItemView {
             </property>
            </spacer>
           </item>
+          <item>
+           <widget class="QPushButton" name="refreshButton_admin">
+            <property name="styleSheet">
+             <string notr="true">QPushButton{
+border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
+            </property>
+            <property name="text">
+             <string>刷新</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -1402,6 +1538,12 @@ border-radius: 10px;
 background-color: #FFFFFF;
 color: #000000;
 padding: 5px;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="placeholderText">
+             <string>输入查询手机号</string>
             </property>
            </widget>
           </item>
@@ -1421,8 +1563,13 @@ padding: 5px;</string>
           <item alignment="Qt::AlignRight">
            <widget class="QPushButton" name="logoutButton_admin">
             <property name="styleSheet">
-             <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(255, 255, 255);</string>
+             <string notr="true">QPushButton{
+font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255)
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
             </property>
             <property name="text">
              <string>Log out</string>
@@ -1434,6 +1581,12 @@ color: rgb(255, 255, 255);</string>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_callrecords">
+       <property name="styleSheet">
+        <string notr="true">
+        background-color: transparent;
+        color: rgb(255, 255, 255);
+        </string>
+       </property>
        <attribute name="title">
         <string>CallRecords</string>
        </attribute>
@@ -1459,8 +1612,13 @@ color: rgb(255, 255, 255);</string>
         <item alignment="Qt::AlignRight">
          <widget class="QPushButton" name="backToUserButton_callRecords">
           <property name="styleSheet">
-           <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(255, 255, 255);</string>
+           <string notr="true">QPushButton{
+font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255)
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
           </property>
           <property name="text">
            <string>Back</string>
@@ -1706,11 +1864,16 @@ padding: 5px;</string>
         <item alignment="Qt::AlignHCenter">
          <widget class="QPushButton" name="confirmRechargeButton">
           <property name="styleSheet">
-           <string notr="true">border: 2px solid #00008B;
+           <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
           </property>
           <property name="text">
            <string>充值</string>
@@ -1720,8 +1883,13 @@ padding: 5px;</string>
         <item alignment="Qt::AlignRight">
          <widget class="QPushButton" name="backToUserButton_recharge">
           <property name="styleSheet">
-           <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(255, 255, 255);</string>
+           <string notr="true">QPushButton{
+font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255)
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
           </property>
           <property name="text">
            <string>Back</string>
@@ -1762,8 +1930,13 @@ color: rgb(255, 255, 255);</string>
         <item alignment="Qt::AlignRight">
          <widget class="QPushButton" name="backToUserButton_billInquiry">
           <property name="styleSheet">
-           <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(255, 255, 255);</string>
+           <string notr="true">QPushButton{
+font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255)
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
           </property>
           <property name="text">
            <string>Back</string>
@@ -1826,11 +1999,16 @@ color: rgb(255, 255, 255);</string>
         <item alignment="Qt::AlignHCenter">
          <widget class="QPushButton" name="handleBusinessButton">
           <property name="styleSheet">
-           <string notr="true">border: 2px solid #00008B;
+           <string notr="true">QPushButton{
+border: 2px solid #00008B;
 border-radius: 10px;
 background-color: #00008B;
 color: #FFFFFF;
-padding: 5px;</string>
+padding: 5px;
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
           </property>
           <property name="text">
            <string>办理</string>
@@ -1840,8 +2018,13 @@ padding: 5px;</string>
         <item alignment="Qt::AlignRight">
          <widget class="QPushButton" name="backToUserButton_businessHandling">
           <property name="styleSheet">
-           <string notr="true">font: 9pt &quot;Times New Roman&quot;;
-color: rgb(255, 255, 255);</string>
+           <string notr="true">QPushButton{
+font: 9pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255)
+}
+QPushButton:hover {
+       background-color: #CCCCCC;
+   }；</string>
           </property>
           <property name="text">
            <string>Back</string>

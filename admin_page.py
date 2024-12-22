@@ -24,7 +24,7 @@ class AdminInterface:
         self.phoneLineEdit = self.main_window.findChild(QtWidgets.QLineEdit, 'phoneLineEdit')
         self.displayListView = self.main_window.findChild(QtWidgets.QListView, 'displayListView')  
 
-
+        self.main_window.refreshButton_admin.clicked.connect(self.refresh_admin_page)
         logout_button = self.main_window.findChild(QtWidgets.QPushButton, 'logoutButton_admin')
         if logout_button:
             logout_button.clicked.connect(self.logout)
@@ -56,24 +56,26 @@ class AdminInterface:
             model = QStringListModel()
             self.displayListView.setModel(model)
             print("displayListView 已清空。")
+            self.refresh_admin_page()
         else:
             print("displayListView 未找到，无法清空。")
 
+    def refresh_admin_page(self):
+        self.system.close_connection()
+        self.system.connect_db()
+    
     def handle_user_actions(self):
-        self.clear_display()
         idx = self.userComboBox.currentIndex()
         phone = self.phoneLineEdit.text().strip()
 
-        # 新增：检查电话号码是否为空
         if not phone:
             QtWidgets.QMessageBox.warning(self.main_window, "输入错误", "电话号码不能为空。")
-            # 阻塞信号，防止重置信号触发
             self.userComboBox.blockSignals(True)
             self.userComboBox.setCurrentIndex(0)
             self.userComboBox.blockSignals(False)
             return
 
-        if idx == 1:  # 查看详细信息
+        if idx == 1:  
             try:
                 user_info = self.system.get_user_info_by_phone(phone)
                 info_text = "\n".join([f"{k}: {v}" for k, v in user_info.items()])
@@ -81,8 +83,9 @@ class AdminInterface:
             except Exception as e:
                 QtWidgets.QMessageBox.warning(self.main_window, "错误", str(e))
 
-        elif idx == 2:  # 查看交易记录
+        elif idx == 2: 
             try:
+                self.clear_display()
                 records = self.system.get_transaction_records_by_phone(phone)
                 list_items = [f"TransactionID: {rec.get('TransactionID', '')}, Time: {rec.get('TransactionTime', '')}, Item: {rec.get('PurchasedItem', '')}, Amount: {rec.get('Amount', '')}" for rec in records]
                 model = QStringListModel(list_items)
@@ -90,7 +93,8 @@ class AdminInterface:
             except Exception as e:
                 QtWidgets.QMessageBox.warning(self.main_window, "错误", str(e))
 
-        elif idx == 3:  # 模拟通话
+        elif idx == 3: 
+            self.clear_display()
             caller = phone
             receiver, ok = QtWidgets.QInputDialog.getText(self.main_window, "模拟通话", "被叫号码:")
             if ok and receiver:
@@ -109,11 +113,11 @@ class AdminInterface:
         self.userComboBox.blockSignals(False)
 
     def handle_business_actions(self):
-        self.clear_display()
         idx = self.businessComboBox.currentIndex()
 
         if idx == 1:  # 展示所有业务
             try:
+                self.clear_display()
                 services = self.system.get_available_services()
                 list_items = [f"ServiceID: {srv.get('ServiceID', '')}, ServiceName: {srv.get('ServiceName', '')}, Price: {srv.get('Price', '')}, Quota: {srv.get('Quota', '')}, ActivationMethodID: {srv.get('ActivationMethodID', '')}, Status: {srv.get('Status', '')}" for srv in services]
                 model = QStringListModel(list_items)
@@ -154,7 +158,7 @@ class AdminInterface:
                     service_name,
                     float(price_str),
                     float(quota_str),
-                    1  # 一个示例激活方式
+                    1 # 默认激活方式为1
                 )
                 QtWidgets.QMessageBox.information(self.main_window, "成功", "业务已发布。")
             except Exception as e:
@@ -166,11 +170,11 @@ class AdminInterface:
         self.businessComboBox.blockSignals(False)
 
     def handle_package_actions(self):
-        self.clear_display()
         idx = self.packageComboBox.currentIndex()
 
         if idx == 1:  # 展示所有套餐
             try:
+                self.clear_display()
                 packages = self.system.get_available_packages()
                 list_items = [f"PackageID: {pkg.get('PackageID', '')}, PackageName: {pkg.get('PackageName', '')}, Price: {pkg.get('PackagePrice', '')}, LaunchTime: {pkg.get('LaunchTime', '')}, ExpirationTime: {pkg.get('ExpirationTime', '')}, ContractDuration: {pkg.get('ContractDuration', '')}, VoiceQuota: {pkg.get('VoiceQuota', '')}, OverQuotaStandard: {pkg.get('OverQuotaStandard', '')}, Status: {pkg.get('Status', '')}" for pkg in packages]
                 model = QStringListModel(list_items)

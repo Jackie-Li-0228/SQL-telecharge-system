@@ -49,6 +49,53 @@ class MainWindow(QtWidgets.QMainWindow):
         self.registerButton.clicked.connect(self.register)
         self.backtologinButton.clicked.connect(self.backtologin)
         self.load_packages()
+        
+        # 应用样式表
+        self.apply_styles()
+        
+    def apply_styles(self):
+        # 定义主窗口的样式表，设置背景图片并拉伸
+        background_image_path = os.path.join(os.path.dirname(__file__), 'src', 'picture', 'background.jpg')
+        # 使用正斜杠或原始字符串
+        background_image_path = background_image_path.replace('\\', '/')
+        if not os.path.exists(background_image_path):
+            QtWidgets.QMessageBox.critical(self, "错误", f"找不到背景图片: {background_image_path}")
+            return
+
+        # 使用 border-image 代替 background-size
+        main_window_style = f"""
+        QMainWindow {{
+            border-image: url("{background_image_path}") 0 0 0 0 stretch stretch;
+        }}
+        """
+
+        # 定义QTabWidget的样式表，设置透明度并拉伸背景图
+        tab_widget_style = """
+        QTabWidget::pane {
+            border-image: url("F:/Projects/sql-telecharge/SQL-telecharge-system/src/picture/background.jpg") 0 0 0 0 stretch stretch;
+            background: rgba(255, 255, 255, 0); /* 完全透明背景 */
+            border-top: -1px;
+            border-left: 1px solid lightgray;
+            border-right: 1px solid lightgray;
+            border-bottom: 1px solid lightgray;
+        }
+        QTabBar::tab {
+            color: rgb(255, 255, 255);
+            border: 0.5px solid lightgray;
+            padding: 5px;
+            background-color: rgba(0, 0, 0, 100); /* 半透明黑色背景 */
+        }
+        QTabBar::tab:hover {
+            background-color: rgba(0, 0, 0, 150); /* 悬停时更高透明度 */
+        }
+        QTabBar::tab:selected {
+            background-color: rgba(0, 0, 0, 200); /* 选中时更高透明度 */
+        }
+        """
+
+        # 应用样式表
+        self.setStyleSheet(main_window_style)
+        self.tabWidget.setStyleSheet(tab_widget_style)
 
     def login(self):
         phone = self.loginTeleNumberEdit.text().strip()
