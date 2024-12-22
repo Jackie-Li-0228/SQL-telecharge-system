@@ -58,22 +58,21 @@ class UserInterface:
     def show_call_records(self):
         phone = self.main_window.current_user_phone
         try:
-            # 调用 src.py 中的方法获取通话记录
             call_records = self.system.get_call_records_by_phone(phone)
+            if call_records is None:
+                call_records = []  # 若未查询到记录，则返回空列表
         
-            # 格式化通话记录
             record_strings = [
                 f"时间: {record['CallTime']}, 时长: {record['CallDuration']} 分钟, 呼叫方: {record['Caller']}, 接收方: {record['Receiver']}"
                 for record in call_records
             ]
-        
-            # 获取 ListView
+
             call_records_list_view = self.main_window.findChild(QtWidgets.QListView, 'callRecordsListView')
             if not call_records_list_view:
                 # 如果 ListView 不存在，创建一个并添加到布局
                 call_records_list_view = QtWidgets.QListView()
                 call_records_list_view.setObjectName('callRecordsListView')
-                bill_inquiry_layout = self.main_window.findChild(QtWidgets.QVBoxLayout, 'billInquiryLayout')  # 确认布局名称
+                bill_inquiry_layout = self.main_window.findChild(QtWidgets.QVBoxLayout, 'billInquiryLayout')  
                 if bill_inquiry_layout:
                     bill_inquiry_layout.addWidget(call_records_list_view)
                 else:

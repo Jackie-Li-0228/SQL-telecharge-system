@@ -44,6 +44,7 @@ class CustomerServiceInterface:
             QtWidgets.QMessageBox.warning(self.main_window, "输入错误", "请输入电话号码。")
             return
         try:
+            self.refresh_service_page()
             user_info = self.system.get_user_info_by_phone(phone)
             transaction_records = self.system.get_transaction_records_by_phone(phone)
 

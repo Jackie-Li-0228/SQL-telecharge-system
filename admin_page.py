@@ -32,7 +32,6 @@ class AdminInterface:
         else:
             print("logoutButton_admin 未找到。")
 
-
         self.userComboBox.clear()
         self.userComboBox.addItem("选择功能")
         self.userComboBox.addItem("查看详细信息")
@@ -65,6 +64,15 @@ class AdminInterface:
         self.clear_display()
         idx = self.userComboBox.currentIndex()
         phone = self.phoneLineEdit.text().strip()
+
+        # 新增：检查电话号码是否为空
+        if not phone:
+            QtWidgets.QMessageBox.warning(self.main_window, "输入错误", "电话号码不能为空。")
+            # 阻塞信号，防止重置信号触发
+            self.userComboBox.blockSignals(True)
+            self.userComboBox.setCurrentIndex(0)
+            self.userComboBox.blockSignals(False)
+            return
 
         if idx == 1:  # 查看详细信息
             try:
@@ -130,6 +138,9 @@ class AdminInterface:
 
             try:
                 phone = self.main_window.current_user_phone
+                if not phone:
+                    QtWidgets.QMessageBox.warning(self.main_window, "输入错误", "管理员电话号码未设置。")
+                    return
                 self.system.add_service_for_admin(
                     phone,
                     service_id,
@@ -172,6 +183,9 @@ class AdminInterface:
                 if confirm == QtWidgets.QMessageBox.StandardButton.Yes:
                     try:
                         phone = self.main_window.current_user_phone
+                        if not phone:
+                            QtWidgets.QMessageBox.warning(self.main_window, "输入错误", "管理员电话号码未设置。")
+                            return
                         self.system.remove_package_for_admin(phone, package_id)
                         QtWidgets.QMessageBox.information(self.main_window, "成功", "已下架套餐。")
                     except Exception as e:
@@ -199,6 +213,9 @@ class AdminInterface:
 
             try:
                 phone = self.main_window.current_user_phone
+                if not phone:
+                    QtWidgets.QMessageBox.warning(self.main_window, "输入错误", "管理员电话号码未设置。")
+                    return
                 self.system.add_package_for_admin(
                     phone,
                     pkg_id,
