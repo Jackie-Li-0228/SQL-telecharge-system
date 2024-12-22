@@ -103,38 +103,36 @@ class UserInterface:
     def switch_to_call_records(self):
         phone = self.main_window.current_user_phone
         try:
-            # 获取通话记录
             call_records = self.system.get_call_records_by_phone(phone)
-            if call_records is None:
-                call_records = []
+            if call_records is None or len(call_records) == 0:
+                QtWidgets.QMessageBox.information(self.main_window, "提示", "无通话记录。")
+            call_records = []
 
-            # 找到显示通话记录的 QTableWidget
             self.callRecordsTableWidget = self.main_window.findChild(QtWidgets.QTableWidget, 'callRecordsTableWidget')
             if not self.callRecordsTableWidget:
                 QtWidgets.QMessageBox.warning(self.main_window, "错误", "无法找到通话记录表格 callRecordsTableWidget。")
                 return
-        
-            # 设置表格列
+
             headers = ['时间', '时长(分钟)', '呼叫方', '接收方']
             self.callRecordsTableWidget.setColumnCount(len(headers))
             self.callRecordsTableWidget.setHorizontalHeaderLabels(headers)
             self.callRecordsTableWidget.setRowCount(len(call_records))
 
-            # 填充表格内容
             for row, record in enumerate(call_records):
                 self.callRecordsTableWidget.setItem(row, 0, QtWidgets.QTableWidgetItem(str(record['CallTime'])))
                 self.callRecordsTableWidget.setItem(row, 1, QtWidgets.QTableWidgetItem(str(record['CallDuration'])))
                 self.callRecordsTableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(str(record['Caller'])))
                 self.callRecordsTableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(str(record['Receiver'])))
-        
-            # 设置为只读
+
             self.callRecordsTableWidget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
             self.callRecordsTableWidget.horizontalHeader().setStretchLastSection(True)
             self.callRecordsTableWidget.resizeColumnsToContents()
-        
-            # 切换到通话记录的标签页
-            self.main_window.tabWidget.setCurrentWidget(self.main_window.findChild(QtWidgets.QWidget,   'tab_callRecords'))
-    
+
+            # 无论是否有记录，都切换到通话记录界面
+            self.main_window.tabWidget.setCurrentWidget(
+                self.main_window.findChild(QtWidgets.QWidget, 'tab_callRecords')
+            )
+
         except PhoneNumberNotFoundError as e:
             QtWidgets.QMessageBox.warning(self.main_window, "错误", str(e))
         except DatabaseError as e:
