@@ -65,7 +65,7 @@ CREATE TABLE PhoneAccounts (
     FOREIGN KEY (UserTypeID) REFERENCES UserTypes(UserTypeID)  -- 用户类型字段
 );
 
-# 插入一些示例电话号码数据
+-- 插入一些示例电话号码数据
 INSERT INTO PhoneAccounts (PhoneNumber, Balance, IsSuspended, VoiceBalance, PackageStartTime, IDCardNumber, PackageID, Password, UserTypeID)
 VALUES
     ('13812345678', 100.00, FALSE, 0.00,NOW(), '123456789012345678', 'T1', '123456', 1),
