@@ -111,7 +111,7 @@ class UserInterface:
             # 找到显示通话记录的 QTableWidget
             self.callRecordsTableWidget = self.main_window.findChild(QtWidgets.QTableWidget, 'callRecordsTableWidget')
             if not self.callRecordsTableWidget:
-                QtWidgets.QMessageBox.warning(self.main_window, "错误", "无法找到呼叫记录表格 callRecordsTableWidget。")
+                QtWidgets.QMessageBox.warning(self.main_window, "错误", "无法找到通话记录表格 callRecordsTableWidget。")
                 return
         
             # 设置表格列

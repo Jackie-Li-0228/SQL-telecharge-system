@@ -1409,11 +1409,13 @@ color: rgb(255, 255, 255);</string>
        <attribute name="title">
         <string>CallRecords</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <layout class="QVBoxLayout" name="verticalLayout_11">
         <item>
-         <widget class="QTableWidget" name="callRecordsListView">
-          <property name="styleSheet">
-           <string notr="true">QTableWidget {
+         <layout class="QVBoxLayout" name="callRecordsTableLayout">
+          <item>
+           <widget class="QTableWidget" name="callRecordsTableWidget">
+            <property name="styleSheet">
+             <string notr="true">QTableWidget {
     border: 2px solid #000000;
     border-radius: 10px;
     background-color: #FFFFFF;
@@ -1421,8 +1423,10 @@ color: rgb(255, 255, 255);</string>
     padding: 5px;
 }
 </string>
-          </property>
-         </widget>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item alignment="Qt::AlignRight">
          <widget class="QPushButton" name="backToUserButton_callRecords">
