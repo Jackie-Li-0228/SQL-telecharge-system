@@ -1462,4 +1462,25 @@ class TelechargeSystem:
     # except Exception as e:
     #     print(f"An error occurred: {e}")
     
+    def package_id_exists(self, package_id):
+        """
+        Checks whether the given package_id already exists in the database.
+        Returns True if it exists, otherwise False.
+        """
+        # 可根据实际情况调整输入格式校验
+        self.check_input_format(package_id, "S :20")
+        query = "SELECT COUNT(*) FROM Packages WHERE PackageID = %s"
+        self.cursor.execute(query, (package_id,))
+        result = self.cursor.fetchone()
+        return (result[0] > 0)
     
+    def service_id_exists(self, service_id):
+        """
+        Checks whether the given service_id already exists in the database.
+        Returns True if it exists, otherwise False.
+        """
+        self.check_input_format(service_id, "S :20")
+        query = "SELECT COUNT(*) FROM Services WHERE ServiceID = %s"
+        self.cursor.execute(query, (service_id,))
+        result = self.cursor.fetchone()
+        return (result[0] > 0)

@@ -124,7 +124,15 @@ class AdminInterface:
 
         elif idx == 2:  # 发布新业务
             service_id, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布业务", "业务ID:")
+
             if not ok or not service_id:
+                return
+            try:
+                if self.system.service_id_exists(service_id.strip()):
+                    QtWidgets.QMessageBox.warning(self.main_window, "错误", f"业务ID {service_id.strip()} 已存在，请更换其他ID。")
+                    return
+            except Exception as e:
+                QtWidgets.QMessageBox.warning(self.main_window, "错误", str(e))
                 return
             service_name, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布业务", "业务名称:")
             if not ok or not service_name:
@@ -191,24 +199,43 @@ class AdminInterface:
                     except Exception as e:
                         QtWidgets.QMessageBox.warning(self.main_window, "错误", str(e))
 
-        elif idx == 3:  # 发布新套餐
+
+        if idx == 3:  # 发布新套餐
             pkg_id, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "套餐ID:")
-            if not ok or not pkg_id:
+            if not ok or not pkg_id.strip():
                 return
+            # 发布前先检查是否重复
+            try:
+                if self.system.package_id_exists(pkg_id.strip()):
+                    QtWidgets.QMessageBox.warning(self.main_window, "错误", f"套餐ID {pkg_id.strip()} 已存在，请更换其他ID。")
+                    return
+            except Exception as e:
+                QtWidgets.QMessageBox.warning(self.main_window, "错误", str(e))
+                return
+
             pkg_name, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "套餐名称:")
-            if not ok or not pkg_name:
+            if not ok or not pkg_name.strip():
                 return
             price_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "价格:")
-            if not ok or not price_str:
+            if not ok or not price_str.strip():
                 return
             contract_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "合约期:")
-            if not ok or not contract_str:
+            if not ok or not contract_str.strip():
                 return
             voice_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "语音额度:")
-            if not ok or not voice_str:
+            if not ok or not voice_str.strip():
                 return
             over_str, ok = QtWidgets.QInputDialog.getText(self.main_window, "发布套餐", "超额标准:")
-            if not ok or not over_str:
+            if not ok or not over_str.strip():
+                return
+
+            try:
+                price = float(price_str)
+                contract = int(contract_str)
+                voice_quota = float(voice_str)
+                over_quota = float(over_str)
+            except ValueError:
+                QtWidgets.QMessageBox.warning(self.main_window, "输入错误", "价格、合约期、语音额度和超额标准必须是数字。")
                 return
 
             try:
@@ -218,12 +245,12 @@ class AdminInterface:
                     return
                 self.system.add_package_for_admin(
                     phone,
-                    pkg_id,
-                    pkg_name,
-                    float(price_str),
-                    int(contract_str),
-                    float(voice_str),
-                    float(over_str)
+                    pkg_id.strip(),
+                    pkg_name.strip(),
+                    price,
+                    contract,
+                    voice_quota,
+                    over_quota
                 )
                 QtWidgets.QMessageBox.information(self.main_window, "成功", "已发布新套餐。")
             except Exception as e:
@@ -233,7 +260,7 @@ class AdminInterface:
         self.packageComboBox.blockSignals(True)
         self.packageComboBox.setCurrentIndex(0)
         self.packageComboBox.blockSignals(False)
-
+    
     def show(self):
         self.main_window.tabWidget.setCurrentIndex(5)
         # 可根据需要刷新页面
