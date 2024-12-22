@@ -15,6 +15,7 @@ class CustomerServiceInterface:
         self.customerServiceTransactionsWidget = self.main_window.findChild(QtWidgets.QWidget, 'customerServiceTransactionsWidget')
         self.allPackagesWidget = self.main_window.findChild(QtWidgets.QWidget, 'allPackagesWidget')
         self.allServicesWidget = self.main_window.findChild(QtWidgets.QWidget, 'allServicesWidget')
+        self.main_window.refreshButton_service.clicked.connect(self.refresh_service_page)
         self.main_window.logoutButton_service.clicked.connect(self.logout)
         
         # 展示所有套餐

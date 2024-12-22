@@ -56,7 +56,7 @@
 		background-color:rgb(0, 0, 0)</string>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_login">
        <property name="styleSheet">
@@ -1056,6 +1056,20 @@ padding: 5px;</string>
             </property>
            </spacer>
           </item>
+          <item alignment="Qt::AlignTop">
+           <widget class="QPushButton" name="refreshButton_user">
+            <property name="styleSheet">
+             <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+            </property>
+            <property name="text">
+             <string>刷新</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -1167,6 +1181,20 @@ padding: 5px;</string>
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="refreshButton_service">
+            <property name="styleSheet">
+             <string notr="true">border: 2px solid #00008B;
+border-radius: 10px;
+background-color: #00008B;
+color: #FFFFFF;
+padding: 5px;</string>
+            </property>
+            <property name="text">
+             <string>刷新</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

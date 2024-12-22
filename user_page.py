@@ -18,6 +18,7 @@ class UserInterface:
         self.main_window.billInquiryButton.clicked.connect(self.switch_to_bill_inquiry)
         self.main_window.businessHandlingButton.clicked.connect(self.switch_to_business_handling)
         self.main_window.callRecordsButton.clicked.connect(self.switch_to_call_records)
+        self.main_window.refreshButton_user.clicked.connect(self.refresh_user_page)
         self.main_window.logoutButton_user.clicked.connect(self.logout)
         
         # 账号停机判定
@@ -103,11 +104,11 @@ class UserInterface:
     def switch_to_call_records(self):
         phone = self.main_window.current_user_phone
         try:
+            call_records = []
             call_records = self.system.get_call_records_by_phone(phone)
             if call_records is None or len(call_records) == 0:
                 QtWidgets.QMessageBox.information(self.main_window, "提示", "无通话记录。")
-            call_records = []
-
+            
             self.callRecordsTableWidget = self.main_window.findChild(QtWidgets.QTableWidget, 'callRecordsTableWidget')
             if not self.callRecordsTableWidget:
                 QtWidgets.QMessageBox.warning(self.main_window, "错误", "无法找到通话记录表格 callRecordsTableWidget。")

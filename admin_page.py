@@ -18,14 +18,13 @@ class AdminInterface:
         self.setup_ui()
 
     def setup_ui(self):
-        # 确保以下名称与 .ui 文件中的 objectName 一致
         self.userComboBox = self.main_window.findChild(QtWidgets.QComboBox, 'userComboBox')
         self.businessComboBox = self.main_window.findChild(QtWidgets.QComboBox, 'businessComboBox')
         self.packageComboBox = self.main_window.findChild(QtWidgets.QComboBox, 'packageComboBox')
         self.phoneLineEdit = self.main_window.findChild(QtWidgets.QLineEdit, 'phoneLineEdit')
-        self.displayListView = self.main_window.findChild(QtWidgets.QListView, 'displayListView')  # 修改为 QListView
+        self.displayListView = self.main_window.findChild(QtWidgets.QListView, 'displayListView')  
 
-        # 确保 logoutButton_admin 名称一致可连上
+
         logout_button = self.main_window.findChild(QtWidgets.QPushButton, 'logoutButton_admin')
         if logout_button:
             logout_button.clicked.connect(self.logout)
