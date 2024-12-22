@@ -50,6 +50,8 @@ class UserInterface:
         self.refresh_user_page()
 
     def refresh_user_page(self):
+        self.system.close_connection()
+        self.system.connect_db()
         if self.accountStatusLabel:
             result = self.system.get_phoneaccount_by_phone(self.main_window.current_user_phone)
             self.main_window.is_suspended = result['IsSuspended']
