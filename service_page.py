@@ -19,7 +19,6 @@ class CustomerServiceInterface:
         
         # 展示所有套餐
         self.display_all_packages()
-
         # 展示所有业务
         self.display_all_services()
 

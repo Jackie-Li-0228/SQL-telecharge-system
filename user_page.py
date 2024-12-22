@@ -130,7 +130,7 @@ class UserInterface:
 
             # 无论是否有记录，都切换到通话记录界面
             self.main_window.tabWidget.setCurrentWidget(
-                self.main_window.findChild(QtWidgets.QWidget, 'tab_callRecords')
+                self.main_window.findChild(QtWidgets.QWidget, 'tab_callrecords')
             )
 
         except PhoneNumberNotFoundError as e:
