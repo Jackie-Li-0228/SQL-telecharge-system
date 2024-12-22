@@ -22,8 +22,10 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # 获取tabWidget并隐藏Tab栏
         self.tabWidget = self.findChild(QtWidgets.QTabWidget, 'tabWidget')
+        self.tabWidget.setTabBarAutoHide(True)
         if self.tabWidget:
             self.tabWidget.tabBar().setVisible(False)
+            self.setCentralWidget(self.tabWidget)
             self.tabWidget.setCurrentIndex(0)  
         else:
             QtWidgets.QMessageBox.critical(self, "错误", "找不到tabWidget控件")
