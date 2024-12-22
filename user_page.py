@@ -177,6 +177,7 @@ class UserInterface:
             try:
                 self.system.make_payment(phone, float(amount),  payment_method)
                 QtWidgets.QMessageBox.information(self.main_window, "充值成功", "话费充值成功！")
+                self.refresh_user_page()
                 self.back_to_user()
             except PhoneNumberNotFoundError as e:
                 QtWidgets.QMessageBox.warning(self.main_window, "错误", str(e))
@@ -341,6 +342,7 @@ class UserInterface:
                     self.system.change_phone_package(self.main_window.current_user_phone, package['PackageID'])
                     QtWidgets.QMessageBox.information(self.main_window, "办理成功", "套餐办理成功！")
                     self.switch_to_business_handling()
+                    self.refresh_user_page()
                 except Exception as e:
                     QtWidgets.QMessageBox.critical(self.main_window, "办理失败", str(e))
         else:
