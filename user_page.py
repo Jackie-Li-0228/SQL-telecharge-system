@@ -17,11 +17,14 @@ class UserInterface:
         self.main_window.rechargeButton.clicked.connect(self.switch_to_recharge)
         self.main_window.billInquiryButton.clicked.connect(self.switch_to_bill_inquiry)
         self.main_window.businessHandlingButton.clicked.connect(self.switch_to_business_handling)
-        self.main_window.callRecordsButton.clicked.connect(self.show_call_records)
+        self.main_window.callRecordsButton.clicked.connect(self.switch_to_call_records)
         self.main_window.logoutButton_user.clicked.connect(self.logout)
         
         # 账号停机判定
         self.accountStatusLabel = self.main_window.findChild(QtWidgets.QLabel, 'accountStatusLabel_user')
+        
+        # 账单查询界面按钮
+        self.main_window.backToUserButton_callRecords.clicked.connect(self.back_to_user)
 
         # 充值界面元素
         self.main_window.confirmRechargeButton.clicked.connect(self.confirm_recharge)
@@ -54,45 +57,6 @@ class UserInterface:
                 self.accountStatusLabel.setText("状态: 正常")
             else:
                 self.accountStatusLabel.setText("状态: 停机")
-
-    def show_call_records(self):
-        phone = self.main_window.current_user_phone
-        try:
-            call_records = self.system.get_call_records_by_phone(phone)
-            if call_records is None:
-                call_records = []  # 若未查询到记录，则返回空列表
-        
-            record_strings = [
-                f"时间: {record['CallTime']}, 时长: {record['CallDuration']} 分钟, 呼叫方: {record['Caller']}, 接收方: {record['Receiver']}"
-                for record in call_records
-            ]
-
-            call_records_list_view = self.main_window.findChild(QtWidgets.QListView, 'callRecordsListView')
-            if not call_records_list_view:
-                # 如果 ListView 不存在，创建一个并添加到布局
-                call_records_list_view = QtWidgets.QListView()
-                call_records_list_view.setObjectName('callRecordsListView')
-                bill_inquiry_layout = self.main_window.findChild(QtWidgets.QVBoxLayout, 'billInquiryLayout')  
-                if bill_inquiry_layout:
-                    bill_inquiry_layout.addWidget(call_records_list_view)
-                else:
-                    QtWidgets.QMessageBox.critical(self.main_window, "错误", "找到账单查询界面的布局 billInquiryLayout")
-                    return
-        
-            # 设置 ListView 的模型
-            model = QtCore.QStringListModel()
-            model.setStringList(record_strings)
-            call_records_list_view.setModel(model)
-        
-            # 切换到账单查询界面
-            self.switch_to_bill_inquiry()
-        
-        except PhoneNumberNotFoundError as e:
-            QtWidgets.QMessageBox.warning(self.main_window, "错误", str(e))
-        except DatabaseError as e:
-            QtWidgets.QMessageBox.critical(self.main_window, "数据库错误", str(e))
-        except Exception as e:
-            QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
 
     def show_my_package(self):
         phone = self.main_window.current_user_phone
@@ -134,7 +98,50 @@ class UserInterface:
             QtWidgets.QMessageBox.critical(self.main_window, "数据库错误", str(e))
         except Exception as e:
             QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
+            
+    # 切换到通话记录界面
+    def switch_to_call_records(self):
+        phone = self.main_window.current_user_phone
+        try:
+            # 获取通话记录
+            call_records = self.system.get_call_records_by_phone(phone)
+            if call_records is None:
+                call_records = []
 
+            # 找到显示通话记录的 QTableWidget
+            self.callRecordsTableWidget = self.main_window.findChild(QtWidgets.QTableWidget, 'callRecordsTableWidget')
+            if not self.callRecordsTableWidget:
+                QtWidgets.QMessageBox.warning(self.main_window, "错误", "无法找到呼叫记录表格 callRecordsTableWidget。")
+                return
+        
+            # 设置表格列
+            headers = ['时间', '时长(分钟)', '呼叫方', '接收方']
+            self.callRecordsTableWidget.setColumnCount(len(headers))
+            self.callRecordsTableWidget.setHorizontalHeaderLabels(headers)
+            self.callRecordsTableWidget.setRowCount(len(call_records))
+
+            # 填充表格内容
+            for row, record in enumerate(call_records):
+                self.callRecordsTableWidget.setItem(row, 0, QtWidgets.QTableWidgetItem(str(record['CallTime'])))
+                self.callRecordsTableWidget.setItem(row, 1, QtWidgets.QTableWidgetItem(str(record['CallDuration'])))
+                self.callRecordsTableWidget.setItem(row, 2, QtWidgets.QTableWidgetItem(str(record['Caller'])))
+                self.callRecordsTableWidget.setItem(row, 3, QtWidgets.QTableWidgetItem(str(record['Receiver'])))
+        
+            # 设置为只读
+            self.callRecordsTableWidget.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
+            self.callRecordsTableWidget.horizontalHeader().setStretchLastSection(True)
+            self.callRecordsTableWidget.resizeColumnsToContents()
+        
+            # 切换到通话记录的标签页
+            self.main_window.tabWidget.setCurrentWidget(self.main_window.findChild(QtWidgets.QWidget,   'tab_callRecords'))
+    
+        except PhoneNumberNotFoundError as e:
+            QtWidgets.QMessageBox.warning(self.main_window, "错误", str(e))
+        except DatabaseError as e:
+            QtWidgets.QMessageBox.critical(self.main_window, "数据库错误", str(e))
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self.main_window, "错误", str(e))
+    
     # 切换到充值界面
     def switch_to_recharge(self):
         self.main_window.tabWidget.setCurrentWidget(self.main_window.findChild(QtWidgets.QWidget, 'tab_recharge'))
