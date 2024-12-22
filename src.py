@@ -3,6 +3,7 @@ from datetime import datetime,timedelta
 from decimal import Decimal
 from Exception_Classes import *
 import re
+import pymysql
 
 SQL_KEYWORDS={
     'select','insert','delete','update','drop','alter','create','where','from','join',
@@ -14,14 +15,28 @@ SENSITIVE_SYMBOLS = [';', ',', '.', '=', '(', ')', '{', '}', '[', ']', '<', '>',
 class TelechargeSystem:
     def __init__(self,db=None,cursor=None):
         # 数据库连接设置
-        self.db = mysql.connector.connect(
-            host="localhost",        # 数据库主机
-            user="root", 
-            password="123123",
-            database="telecharge"
-        )
-        self.cursor = self.db.cursor()
+        self.db = None
+        self.cursor = None
+        self.connect_db()
 
+    def connect_db(self):
+        # 如果尚未连接或连接已断开，则重新连接
+        if not self.db:
+            self.db = pymysql.connect(
+                host='localhost',
+                user='root',
+                password='123123', 
+                database='telecharge',
+                autocommit=True
+            )
+            self.cursor = self.db.cursor()
+            
+    def close_connection(self):
+        if self.db:
+            self.db.close()
+            self.db = None
+            self.cursor = None
+    
     def check_input_format(self,input_data, format_str):
         # 1. SQL关键字检查
         input_data_str = str(input_data).lower()
@@ -49,7 +64,7 @@ class TelechargeSystem:
             if not isinstance(input_data, str):
                 raise InputCheckFailed(f"Expected a string but got {type(input_data).__name__}.")
             
-                    # 检查敏感符号
+            # 检查敏感符号
             if any(symbol in input_data for symbol in SENSITIVE_SYMBOLS):
                 raise InputCheckFailed(f"Input contains sensitive programming symbols: {', '.join(SENSITIVE_SYMBOLS)}.")
 
@@ -1423,7 +1438,7 @@ class TelechargeSystem:
         """
         # 检查输入类型
         self.check_input_format(phone_number, "I =11")
-
+        self.connect_db()
         try:
             # 查询该手机号对应的账户信息
             self.cursor.execute("""
@@ -1448,6 +1463,7 @@ class TelechargeSystem:
                 "Password": password,
                 "IsSuspended": is_suspended
             }
+            
         
         except mysql.connector.Error as err:
             print(f"Database error: {err}")
@@ -1462,4 +1478,25 @@ class TelechargeSystem:
     # except Exception as e:
     #     print(f"An error occurred: {e}")
     
+    def package_id_exists(self, package_id):
+        """
+        Checks whether the given package_id already exists in the database.
+        Returns True if it exists, otherwise False.
+        """
+        # 可根据实际情况调整输入格式校验
+        self.check_input_format(package_id, "S :20")
+        query = "SELECT COUNT(*) FROM Packages WHERE PackageID = %s"
+        self.cursor.execute(query, (package_id,))
+        result = self.cursor.fetchone()
+        return (result[0] > 0)
     
+    def service_id_exists(self, service_id):
+        """
+        Checks whether the given service_id already exists in the database.
+        Returns True if it exists, otherwise False.
+        """
+        self.check_input_format(service_id, "S :20")
+        query = "SELECT COUNT(*) FROM Services WHERE ServiceID = %s"
+        self.cursor.execute(query, (service_id,))
+        result = self.cursor.fetchone()
+        return (result[0] > 0)
